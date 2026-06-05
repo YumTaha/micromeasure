@@ -26,7 +26,7 @@ class MeasureContext:
 class Handle(QGraphicsEllipseItem):
     """A draggable point. Notifies its owning measurement on every move."""
 
-    def __init__(self, owner: "BaseMeasurement", p: Pt, color: QColor, radius: int = 6) -> None:
+    def __init__(self, owner: "BaseMeasurement", p: Pt, color: QColor, radius: int = 4) -> None:
         super().__init__(-radius, -radius, 2 * radius, 2 * radius)
         self._owner = owner
         self.setBrush(QBrush(color))
@@ -144,10 +144,29 @@ class DistanceM(BaseMeasurement):
         return tuple(self.pts())  # type: ignore[return-value]
 
 
+def _extension(a: Pt, b: Pt, inter: Pt) -> tuple[Pt, Pt] | None:
+    """Segment from the near endpoint of a-b out to `inter`, or None if `inter`
+    already lies within the drawn segment (no extension needed)."""
+    abx = b.x - a.x
+    aby = b.y - a.y
+    denom = abx * abx + aby * aby
+    if denom == 0:
+        return None
+    t = ((inter.x - a.x) * abx + (inter.y - a.y) * aby) / denom
+    if 0.0 <= t <= 1.0:
+        return None
+    near = a if t < 0 else b
+    return near, inter
+
+
 class Angle4M(BaseMeasurement):
     kind = KIND_ANGLE
 
     def _build(self, pts: list[Pt]) -> None:
+        faded = QColor(items.COLOR_ANGLE)
+        faded.setAlpha(110)
+        self._ext1 = self._add(items.make_line(pts[0], pts[0], faded, width=1, dashed=True))
+        self._ext2 = self._add(items.make_line(pts[0], pts[0], faded, width=1, dashed=True))
         self._l1 = self._add_line(items.COLOR_ANGLE)
         self._l2 = self._add_line(items.COLOR_ANGLE)
         for p in pts:
@@ -172,9 +191,20 @@ class Angle4M(BaseMeasurement):
             e2 = p3 if g.distance(inter, p3) >= g.distance(inter, p4) else p4
             v1 = Pt(e1.x - inter.x, e1.y - inter.y)
             v2 = Pt(e2.x - inter.x, e2.y - inter.y)
+        self._set_extension(self._ext1, p1, p2, inter)
+        self._set_extension(self._ext2, p3, p4, inter)
         self._arc.setPath(items.arc_path(center, v1, v2))
         self._label.set_text(f"{self.value:.2f} deg")
         self._label.set_anchor(center)
+
+    @staticmethod
+    def _set_extension(line, a: Pt, b: Pt, inter: Pt | None) -> None:
+        ext = _extension(a, b, inter) if inter is not None else None
+        if ext is None:
+            line.setVisible(False)
+        else:
+            line.setLine(ext[0].x, ext[0].y, ext[1].x, ext[1].y)
+            line.setVisible(True)
 
 
 class RelAngleM(BaseMeasurement):

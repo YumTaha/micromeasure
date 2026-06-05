@@ -93,6 +93,13 @@ def main() -> None:
     a2 = max(view._measurements.values(), key=lambda m: m.mid)
     assert approx(a2.value, 60.0, 0.1), a2.value
 
+    # far-apart lines -> dashed extensions to the intersection are shown
+    view._create(Angle4M, [Pt(0, 0), Pt(10, 0), Pt(100, -50), Pt(100, -60)])
+    far = max(view._measurements.values(), key=lambda m: m.mid)
+    assert far._ext1.isVisible() and far._ext2.isVisible()
+    # overlapping intersection (shared vertex) -> no extensions
+    assert not a1._ext1.isVisible() and not a1._ext2.isVisible()
+
     print("smoke: all checks passed")
     app.quit()
 
