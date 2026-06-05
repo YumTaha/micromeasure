@@ -14,6 +14,7 @@ from micromeasure.ui.graphics_measure import (
     Angle4M,
     BaseMeasurement,
     DistanceM,
+    Handle,
     MeasureContext,
     OriginM,
     PointPerpM,
@@ -70,6 +71,7 @@ class MeasureView(QGraphicsView):
         self._measurements: dict[int, BaseMeasurement] = {}
         self._origin: OriginM | None = None
         self._next_id = 1
+        self._editing = False  # dragging a handle while in Pan mode
 
         self._ctx = MeasureContext(
             scale_provider=lambda: self._mm_per_px,
@@ -204,6 +206,12 @@ class MeasureView(QGraphicsView):
             super().mousePressEvent(event)
             return
         if self._tool == Tool.PAN:
+            # grabbing a handle drags the point; empty space pans
+            if event.button() == Qt.MouseButton.LeftButton and isinstance(
+                self.itemAt(event.position().toPoint()), Handle
+            ):
+                self._editing = True
+                self.setDragMode(QGraphicsView.DragMode.NoDrag)
             super().mousePressEvent(event)
             return
         if event.button() != Qt.MouseButton.LeftButton:
@@ -222,7 +230,10 @@ class MeasureView(QGraphicsView):
             return
         sp = self.mapToScene(event.position().toPoint())
         if self._tool == Tool.PAN:
-            self._mag.hide()
+            if self._editing and (event.buttons() & Qt.MouseButton.LeftButton):
+                self._show_mag(sp)
+            else:
+                self._mag.hide()
             return
         if self._tool == Tool.SELECT:
             # show the loupe while dragging a handle so endpoints can be placed precisely
@@ -240,6 +251,13 @@ class MeasureView(QGraphicsView):
         self._mag.move(self.viewport().width() - self._mag.width() - 10, 10)
         self._mag.raise_()
         self._mag.show()
+
+    def mouseReleaseEvent(self, event) -> None:  # noqa: N802
+        super().mouseReleaseEvent(event)
+        if self._tool == Tool.PAN and self._editing:
+            self._editing = False
+            self.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
+            self._mag.hide()
 
     def leaveEvent(self, event) -> None:  # noqa: N802
         self._mag.hide()
@@ -269,9 +287,9 @@ class MeasureView(QGraphicsView):
             self._add_preview(items.make_line(pts[0], cursor, color))
             if tool == Tool.LINE_REL and self._origin is not None:
                 o = self._origin.as_line()
-                rel = g.relative_angle_deg(o[0], o[1], pts[0], cursor)
+                rel = g.fold_to_axis(g.relative_angle_deg(o[0], o[1], pts[0], cursor))
                 lbl = items.LabelItem(color)
-                lbl.set_text(f"{rel:+.2f} deg")
+                lbl.set_text(f"{rel:+.2f}°")
                 lbl.set_anchor(g.midpoint(pts[0], cursor))
                 self._add_preview(lbl)
         elif tool == Tool.ANGLE4:
@@ -287,7 +305,7 @@ class MeasureView(QGraphicsView):
                 self._add_preview(items.make_line(pts[2], cursor, items.COLOR_PREVIEW))
                 ang = g.angle_at_vertex(pts[0], pts[1], pts[2], cursor)
                 lbl = items.LabelItem(items.COLOR_ANGLE)
-                lbl.set_text(f"{ang:.2f} deg")
+                lbl.set_text(f"{ang:.2f}°")
                 lbl.set_anchor(cursor)
                 self._add_preview(lbl)
 

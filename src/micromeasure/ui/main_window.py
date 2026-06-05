@@ -196,7 +196,6 @@ class MainWindow(QMainWindow):
         self._row_of[mid] = r
         self._write_row(r, row)
         self._table.scrollToBottom()
-        self._trial_spin.setValue(self._trial_spin.value() + 1)
         self.statusBar().showMessage(f"{kind}: {self._fmt(value)} {unit}", 5000)
 
     def _on_changed(self, mid: int, value: float, unit: str, detail: str) -> None:

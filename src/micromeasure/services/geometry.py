@@ -38,6 +38,12 @@ def relative_angle_deg(o1: Pt, o2: Pt, a: Pt, b: Pt) -> float:
     return norm180(line_angle_deg(a, b) - line_angle_deg(o1, o2))
 
 
+def fold_to_axis(deg: float) -> float:
+    """Fold an angle into [-45, 45], i.e. measure it against whichever is
+    nearer: the origin line or its perpendicular. E.g. +78.21 -> -11.79."""
+    return ((deg + 45.0) % 90.0) - 45.0
+
+
 def angle_between_deg(a1: Pt, a2: Pt, b1: Pt, b2: Pt) -> float:
     """Unsigned angle in [0, 180] between the drawn directions a1->a2 and
     b1->b2 (the angle the two lines open by, as drawn)."""

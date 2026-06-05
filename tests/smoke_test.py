@@ -47,14 +47,20 @@ def main() -> None:
     # --- origin + angle vs origin ---------------------------------------
     view._set_origin([Pt(0, 200), Pt(100, 200)])  # horizontal origin
     assert view.has_origin()
-    view._create(RelAngleM, [Pt(0, 200), Pt(100, 150)])  # +26.565 deg
+    view._create(RelAngleM, [Pt(0, 200), Pt(100, 150)])  # +26.565 (< 45, unchanged)
     rel = [m for m in view._measurements.values() if isinstance(m, RelAngleM)][0]
     assert approx(rel.value, 26.565), rel.value
+    assert rel.unit == "°"
 
     # moving the origin updates the dependent relative angle
     view._origin.handles[1].setPos(QPointF(100, 150))  # origin now +26.565 itself
     assert approx(rel.value, 0.0, 0.1), rel.value
     view._origin.handles[1].setPos(QPointF(100, 200))  # restore
+
+    # fold past 45 deg: a 60-deg line vs horizontal origin -> -30 (to perpendicular)
+    view._create(RelAngleM, [Pt(0, 200), Pt(50, 200 - 86.60254)])
+    folded = max(view._measurements.values(), key=lambda m: m.mid)
+    assert approx(folded.value, -30.0, 0.1), folded.value
 
     # --- point -> perpendicular distance to origin ----------------------
     view._create(PointPerpM, [Pt(50, 150)])  # 50 px above origin -> 0.31835 mm

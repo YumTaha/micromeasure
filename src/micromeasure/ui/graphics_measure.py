@@ -4,7 +4,7 @@ import math
 from collections.abc import Callable
 from dataclasses import dataclass
 
-from PySide6.QtGui import QBrush, QColor, QPen
+from PySide6.QtGui import QBrush, QColor, QPainterPath, QPen
 from PySide6.QtWidgets import QGraphicsEllipseItem, QGraphicsItem, QGraphicsScene
 
 from micromeasure.services import geometry as g
@@ -26,7 +26,10 @@ class MeasureContext:
 class Handle(QGraphicsEllipseItem):
     """A draggable point. Notifies its owning measurement on every move."""
 
-    def __init__(self, owner: "BaseMeasurement", p: Pt, color: QColor, radius: int = 4) -> None:
+    # extra clickable padding (scene units) so the small dot is still easy to grab
+    _HIT_PAD = 7.0
+
+    def __init__(self, owner: "BaseMeasurement", p: Pt, color: QColor, radius: int = 2) -> None:
         super().__init__(-radius, -radius, 2 * radius, 2 * radius)
         self._owner = owner
         self.setBrush(QBrush(color))
@@ -41,6 +44,14 @@ class Handle(QGraphicsEllipseItem):
     def point(self) -> Pt:
         sp = self.scenePos()
         return Pt(sp.x(), sp.y())
+
+    def boundingRect(self):  # noqa: ANN201 (Qt override)
+        return self.rect().adjusted(-self._HIT_PAD, -self._HIT_PAD, self._HIT_PAD, self._HIT_PAD)
+
+    def shape(self) -> QPainterPath:
+        path = QPainterPath()
+        path.addEllipse(self.boundingRect())
+        return path
 
     def itemChange(self, change, value):  # noqa: N802
         if change == _POS_CHANGED:
@@ -179,7 +190,7 @@ class Angle4M(BaseMeasurement):
         self._l1.set_pts(p1, p2)
         self._l2.set_pts(p3, p4)
         self.value = g.angle_at_vertex(p1, p2, p3, p4)
-        self.unit, self.detail = "deg", "angle between 2 lines"
+        self.unit, self.detail = "°", "angle between 2 lines"
         inter = g.line_intersection(p1, p2, p3, p4)
         if inter is None:
             center = g.midpoint(g.midpoint(p1, p2), g.midpoint(p3, p4))
@@ -194,7 +205,7 @@ class Angle4M(BaseMeasurement):
         self._set_extension(self._ext1, p1, p2, inter)
         self._set_extension(self._ext2, p3, p4, inter)
         self._arc.setPath(items.arc_path(center, v1, v2))
-        self._label.set_text(f"{self.value:.2f} deg")
+        self._label.set_text(f"{self.value:.2f}°")
         self._label.set_anchor(center)
 
     @staticmethod
@@ -221,12 +232,13 @@ class RelAngleM(BaseMeasurement):
         self._line.set_pts(a, b)
         origin = self._ctx.origin_provider()
         if origin is None:
-            self.value, self.unit, self.detail = math.nan, "deg", "no origin"
+            self.value, self.unit, self.detail = math.nan, "°", "no origin"
             self._label.set_text("(no origin)")
         else:
-            self.value = g.relative_angle_deg(origin[0], origin[1], a, b)
-            self.unit, self.detail = "deg", "vs origin"
-            self._label.set_text(f"{self.value:+.2f} deg")
+            rel = g.relative_angle_deg(origin[0], origin[1], a, b)
+            self.value = g.fold_to_axis(rel)
+            self.unit, self.detail = "°", "vs origin (folded ±45)"
+            self._label.set_text(f"{self.value:+.2f}°")
         self._label.set_anchor(g.midpoint(a, b))
 
     def line_for_selection(self) -> tuple[Pt, Pt] | None:
