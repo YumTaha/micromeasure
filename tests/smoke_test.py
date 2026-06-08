@@ -79,6 +79,7 @@ def main() -> None:
     between = max(view._measurements.values(), key=lambda m: m.mid)
     assert approx(between.value, 90.0), between.value
     assert not between.handles  # linked annotation creates no duplicate points
+    assert set(between.display_id().split("-")) == {str(src_h.mid), str(src_v.mid)}, between.display_id()
 
     # moving an ORIGINAL line endpoint updates the linked angle
     src_v.handles[1].setPos(QPointF(100, -100))  # vertical -> 45-deg diagonal

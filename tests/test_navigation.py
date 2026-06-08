@@ -72,7 +72,7 @@ def main() -> None:
     win._csv_path = csv
     win._do_autosave()
     lines = csv.read_text(encoding="utf-8-sig").strip().splitlines()
-    assert lines[0].split(",")[:2] == ["Index", "Image"], lines[0]
+    assert lines[0].split(",")[:2] == ["#", "Image"], lines[0]
     assert "img1.png" in lines[1] and "img2.png" in lines[2]
 
     print("navigation: all checks passed")

@@ -67,6 +67,8 @@ class MainWindow(QMainWindow):
         self._view.changed.connect(self._on_changed)
         self._view.removed.connect(self._on_removed)
         self._view.status.connect(lambda m: self.statusBar().showMessage(m, 6000))
+        self._view.navigate.connect(self._step)
+        self._view.tool_changed.connect(self._sync_tool_action)
         self.setCentralWidget(self._view)
 
         self._build_toolbar()
@@ -138,8 +140,8 @@ class MainWindow(QMainWindow):
         self._csv_label.setWordWrap(True)
         layout.addWidget(self._csv_label)
 
-        self._table = QTableWidget(0, 5)
-        self._table.setHorizontalHeaderLabels(["Part", "Op", "Kind", "Value", "Unit"])
+        self._table = QTableWidget(0, 6)
+        self._table.setHorizontalHeaderLabels(["#", "Part", "Op", "Kind", "Value", "Unit"])
         self._table.horizontalHeader().setStretchLastSection(True)
         layout.addWidget(self._table)
 
@@ -259,6 +261,7 @@ class MainWindow(QMainWindow):
                         "tag": r.tag,
                         "points": [[p.x, p.y] for p in r.points],
                         "src": [list(r.src[0]), list(r.src[1])] if r.src else None,
+                        "label": row.label if row else str(r.mid),
                         "part": row.part if row else name,
                         "operator": row.operator if row else "",
                         "kind": row.kind if row else "",
@@ -313,6 +316,7 @@ class MainWindow(QMainWindow):
             self._docs[idx] = (records, origin)
             if origin is not None:
                 self._carried_origin = origin
+        self._rebuild_table()
         self._load_index(0)
         self.statusBar().showMessage("Loaded saved drawings for review.", 6000)
 
@@ -320,6 +324,7 @@ class MainWindow(QMainWindow):
         mid = int(m["mid"])
         row = Measurement(
             index=mid,
+            label=m.get("label", str(mid)),
             image=name,
             part=m.get("part", name),
             operator=m.get("operator", ""),
@@ -329,10 +334,6 @@ class MainWindow(QMainWindow):
             detail=m.get("detail", ""),
         )
         self._rows[mid] = row
-        r = self._table.rowCount()
-        self._table.insertRow(r)
-        self._row_of[mid] = r
-        self._write_row(r, row)
 
     def _load_index(self, i: int) -> None:
         if not self._paths or not (0 <= i < len(self._paths)):
@@ -376,6 +377,11 @@ class MainWindow(QMainWindow):
         return ""
 
     # --------------------------------------------------------------- actions
+    def _sync_tool_action(self, tool: Tool) -> None:
+        act = self._tool_actions.get(tool)
+        if act is not None:
+            act.setChecked(True)
+
     def _select_tool(self, tool: Tool) -> None:
         before = self._view.has_origin()
         self._view.set_tool(tool)
@@ -418,6 +424,7 @@ class MainWindow(QMainWindow):
     def _on_added(self, mid: int, kind: str, value: float, unit: str, detail: str) -> None:
         row = Measurement(
             index=mid,
+            label=self._view.display_id(mid),
             image=self._current_image_name(),
             part=self._part_edit.text(),
             operator=self._operator_edit.text(),
@@ -427,11 +434,10 @@ class MainWindow(QMainWindow):
             detail=detail,
         )
         self._rows[mid] = row
-        r = self._table.rowCount()
-        self._table.insertRow(r)
-        self._row_of[mid] = r
-        self._write_row(r, row)
-        self._table.scrollToBottom()
+        self._rebuild_table()
+        item = self._table.item(self._row_of.get(mid, 0), 0)
+        if item is not None:
+            self._table.scrollToItem(item)
         self.statusBar().showMessage(f"{kind}: {self._fmt(value)} {unit}", 5000)
         self._schedule_autosave()
 
@@ -444,16 +450,14 @@ class MainWindow(QMainWindow):
         self._schedule_autosave()
 
     def _on_removed(self, mid: int) -> None:
-        if mid not in self._row_of:
+        if mid not in self._rows:
             return
-        r = self._row_of.pop(mid)
         self._rows.pop(mid, None)
-        self._table.removeRow(r)
-        self._row_of = {k: (v - 1 if v > r else v) for k, v in self._row_of.items()}
+        self._rebuild_table()
         self._schedule_autosave()
 
     def _write_row(self, r: int, m: Measurement) -> None:
-        cells = [m.part, m.operator, m.kind, self._fmt(m.value), m.unit]
+        cells = [f"#{m.label}", m.part, m.operator, m.kind, self._fmt(m.value), m.unit]
         for col, text in enumerate(cells):
             self._table.setItem(r, col, QTableWidgetItem(text))
 
@@ -462,8 +466,25 @@ class MainWindow(QMainWindow):
         return "nan" if math.isnan(value) else f"{value:.4f}"
 
     # ----------------------------------------------------------------- CSV
+    def _order_key(self, m: Measurement) -> tuple[int, int, int]:
+        # Angle-between rows ("a-b") sort right after their higher source line;
+        # normal rows sort by their own number.
+        parts = m.label.split("-")
+        if len(parts) == 2:
+            nums = [0 if p == "O" else int(p) for p in parts]
+            return (max(nums), 1, m.index)
+        return (m.index, 0, m.index)
+
     def _ordered_rows(self) -> list[Measurement]:
-        return [self._rows[mid] for mid in sorted(self._rows)]
+        return sorted(self._rows.values(), key=self._order_key)
+
+    def _rebuild_table(self) -> None:
+        self._table.setRowCount(0)
+        self._row_of = {}
+        for r, m in enumerate(self._ordered_rows()):
+            self._table.insertRow(r)
+            self._row_of[m.index] = r
+            self._write_row(r, m)
 
     def _set_csv(self) -> None:
         path, _ = QFileDialog.getSaveFileName(self, "Auto-save CSV", "measurements.csv", "CSV (*.csv)")

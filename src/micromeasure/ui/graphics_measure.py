@@ -43,7 +43,7 @@ class Handle(QGraphicsEllipseItem):
     # extra clickable padding (scene units) so the small dot is still easy to grab
     _HIT_PAD = 7.0
 
-    def __init__(self, owner: "BaseMeasurement", p: Pt, color: QColor, radius: int = 2) -> None:
+    def __init__(self, owner: "BaseMeasurement", p: Pt, color: QColor, radius: int = 1) -> None:
         super().__init__(-radius, -radius, 2 * radius, 2 * radius)
         self._owner = owner
         self.setBrush(QBrush(color))
@@ -141,6 +141,10 @@ class BaseMeasurement:
     def to_record(self) -> MRecord:
         return MRecord(mid=self.mid, tag=self.tag, points=self.pts())
 
+    def display_id(self) -> str:
+        """Identifier shown next to the drawing and in the CSV `#` column."""
+        return str(self.mid)
+
     # -- subclass hooks ---------------------------------------------------
     def _build(self, pts: list[Pt]) -> None:
         raise NotImplementedError
@@ -166,10 +170,10 @@ class DistanceM(BaseMeasurement):
         scale = self._ctx.scale_provider()
         if math.isfinite(scale):
             self.value, self.unit, self.detail = px * scale, "mm", f"{px:.1f} px"
-            self._label.set_text(f"{self.value:.4f} mm")
+            self._label.set_text(f"#{self.display_id()}  {self.value:.4f} mm")
         else:
             self.value, self.unit, self.detail = px, "px", "uncalibrated"
-            self._label.set_text(f"{px:.1f} px")
+            self._label.set_text(f"#{self.display_id()}  {px:.1f} px")
         self._label.set_anchor(g.midpoint(a, b))
 
     def line_for_selection(self) -> tuple[Pt, Pt] | None:
@@ -243,7 +247,7 @@ class Angle4M(BaseMeasurement):
         _apply_extension(self._ext1, p1, p2, inter)
         _apply_extension(self._ext2, p3, p4, inter)
         self._arc.setPath(items.arc_path(center, v1, v2))
-        self._label.set_text(f"{self.value:.2f}°")
+        self._label.set_text(f"#{self.display_id()}  {self.value:.2f}°")
         self._label.set_anchor(center)
 
 
@@ -263,12 +267,12 @@ class RelAngleM(BaseMeasurement):
         origin = self._ctx.origin_provider()
         if origin is None:
             self.value, self.unit, self.detail = math.nan, "°", "no origin"
-            self._label.set_text("(no origin)")
+            self._label.set_text(f"#{self.display_id()}  (no origin)")
         else:
             rel = g.relative_angle_deg(origin[0], origin[1], a, b)
             self.value = g.fold_to_axis(rel)
             self.unit, self.detail = "°", "vs origin (folded ±45)"
-            self._label.set_text(f"{self.value:+.2f}°")
+            self._label.set_text(f"#{self.display_id()}  {self.value:+.2f}°")
         self._label.set_anchor(g.midpoint(a, b))
 
     def line_for_selection(self) -> tuple[Pt, Pt] | None:
@@ -290,7 +294,7 @@ class PointPerpM(BaseMeasurement):
         if origin is None:
             self.value, self.unit, self.detail = math.nan, "px", "no origin"
             self._foot.setLine(p.x, p.y, p.x, p.y)
-            self._label.set_text("(no origin)")
+            self._label.set_text(f"#{self.display_id()}  (no origin)")
             self._label.set_anchor(p)
             return
         foot = g.project_point(p, origin[0], origin[1])
@@ -299,10 +303,10 @@ class PointPerpM(BaseMeasurement):
         scale = self._ctx.scale_provider()
         if math.isfinite(scale):
             self.value, self.unit, self.detail = px * scale, "mm", f"{px:.1f} px"
-            self._label.set_text(f"{self.value:.4f} mm")
+            self._label.set_text(f"#{self.display_id()}  {self.value:.4f} mm")
         else:
             self.value, self.unit, self.detail = px, "px", "uncalibrated"
-            self._label.set_text(f"{px:.1f} px")
+            self._label.set_text(f"#{self.display_id()}  {px:.1f} px")
         self._label.set_anchor(g.midpoint(p, foot))
 
 
@@ -349,6 +353,13 @@ class AngleBetweenM(BaseMeasurement):
     def to_record(self) -> MRecord:
         return MRecord(mid=self.mid, tag=self.tag, points=[], src=self.src_refs)
 
+    def display_id(self) -> str:
+        if self.src_refs is None:
+            return str(self.mid)
+        a = "O" if self.src_refs[0][0] == 0 else str(self.src_refs[0][0])
+        b = "O" if self.src_refs[1][0] == 0 else str(self.src_refs[1][0])
+        return f"{a}-{b}"
+
     def _build(self, pts: list[Pt]) -> None:
         faded = QColor(items.COLOR_ANGLE)
         faded.setAlpha(110)
@@ -379,5 +390,5 @@ class AngleBetweenM(BaseMeasurement):
         _apply_extension(self._ext1, a1, b1, inter)
         _apply_extension(self._ext2, a2, b2, inter)
         self._arc.set_arc(center, v1, v2)
-        self._label.set_text(f"{self.value:.2f}°")
+        self._label.set_text(f"#{self.display_id()}  {self.value:.2f}°")
         self._label.set_anchor(center)

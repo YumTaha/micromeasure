@@ -3,9 +3,15 @@ from __future__ import annotations
 import math
 from enum import Enum, auto
 
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QPixmap
-from PySide6.QtWidgets import QGraphicsItem, QGraphicsPixmapItem, QGraphicsScene, QGraphicsView
+from PySide6.QtCore import QPointF, Qt, Signal
+from PySide6.QtGui import QColor, QCursor, QPainter, QPen, QPixmap
+from PySide6.QtWidgets import (
+    QGraphicsEllipseItem,
+    QGraphicsItem,
+    QGraphicsPixmapItem,
+    QGraphicsScene,
+    QGraphicsView,
+)
 
 from micromeasure.services import geometry as g
 from micromeasure.services.geometry import Pt
@@ -21,7 +27,7 @@ from micromeasure.ui.graphics_measure import (
     PointPerpM,
     RelAngleM,
 )
-from micromeasure.ui.magnifier import Magnifier
+from micromeasure.ui.magnifier import CursorLoupe, Magnifier
 
 
 class Tool(Enum):
@@ -55,11 +61,29 @@ _TAG_FACTORY: dict[str, type[BaseMeasurement]] = {
 }
 
 
+def _make_dot_cursor() -> QCursor:
+    """A small green dot cursor (matches the loupe crosshair color)."""
+    size = 16
+    pm = QPixmap(size, size)
+    pm.fill(Qt.GlobalColor.transparent)
+    painter = QPainter(pm)
+    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+    painter.setPen(QPen(QColor(0, 0, 0, 150), 1))
+    painter.setBrush(QColor(60, 220, 60))
+    painter.drawEllipse(QPointF(size / 2, size / 2), 2.0, 2.0)
+    painter.end()
+    return QCursor(pm, size // 2, size // 2)
+
+
 class MeasureView(QGraphicsView):
     added = Signal(int, str, float, str, str)  # mid, kind, value, unit, detail
     changed = Signal(int, float, str, str)  # mid, value, unit, detail
     removed = Signal(int)  # mid
     status = Signal(str)
+    navigate = Signal(int)  # +1 / -1 from arrow keys
+    tool_changed = Signal(object)  # Tool, when the view switches tools itself
+
+    _SNAP_PX = 12.0  # cursor-to-handle snap radius, in screen pixels
 
     def __init__(self) -> None:
         super().__init__()
@@ -68,6 +92,7 @@ class MeasureView(QGraphicsView):
         self.setMouseTracking(True)
         self.setTransformationAnchor(QGraphicsView.ViewportAnchor.AnchorUnderMouse)
         self.setDragMode(QGraphicsView.DragMode.NoDrag)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 
         self._pixmap_item: QGraphicsPixmapItem | None = None
         self._tool = Tool.SELECT
@@ -79,23 +104,31 @@ class MeasureView(QGraphicsView):
         self._origin: OriginM | None = None
         self._next_id = 1
         self._editing = False  # dragging a handle while in Pan mode
+        self._snap_handle: Handle | None = None
+        self._snap_scene: Pt | None = None
+        self._drag_handle: Handle | None = None  # snapped point grabbed for moving
 
         self._ctx = MeasureContext(
             scale_provider=lambda: self._mm_per_px,
             origin_provider=lambda: self._origin.as_line() if self._origin else None,
         )
         self._mag = Magnifier(self.viewport())
+        self._loupe = CursorLoupe(self.viewport())
+        self._dot_cursor = _make_dot_cursor()
+        self.viewport().setCursor(self._dot_cursor)
 
     # ----------------------------------------------------------- public api
     def set_image(self, pixmap: QPixmap) -> None:
+        self._cancel_in_progress()
         self._scene.clear()
         self._measurements.clear()
         self._origin = None
-        self._pts.clear()
-        self._preview.clear()
+        self._snap_handle = None
+        self._snap_scene = None
         self._pixmap_item = self._scene.addPixmap(pixmap)
         self._scene.setSceneRect(self._pixmap_item.boundingRect())
         self._mag.set_source(pixmap)
+        self._loupe.set_source(pixmap)
         self.resetTransform()
         self.fitInView(self._pixmap_item, Qt.AspectRatioMode.KeepAspectRatio)
 
@@ -106,9 +139,14 @@ class MeasureView(QGraphicsView):
     def set_magnifier(self, zoom: float, size: int) -> None:
         self._mag.set_zoom(zoom)
         self._mag.setFixedSize(size, size)
+        self._loupe.set_zoom(zoom)
 
     def has_origin(self) -> bool:
         return self._origin is not None
+
+    def display_id(self, mid: int) -> str:
+        m = self._measurements.get(mid)
+        return m.display_id() if m is not None else str(mid)
 
     def next_id(self) -> int:
         return self._next_id
@@ -126,8 +164,10 @@ class MeasureView(QGraphicsView):
             self.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
         elif tool == Tool.SELECT:
             self.setDragMode(QGraphicsView.DragMode.RubberBandDrag)
+            self.viewport().setCursor(self._dot_cursor)
         else:
             self.setDragMode(QGraphicsView.DragMode.NoDrag)
+            self.viewport().setCursor(self._dot_cursor)
 
     def selected_line_count(self) -> int:
         return len([it for it in self._scene.selectedItems() if isinstance(it, items.MeasureLine)])
@@ -332,6 +372,14 @@ class MeasureView(QGraphicsView):
         if event.button() != Qt.MouseButton.LeftButton:
             super().mousePressEvent(event)
             return
+        shift = bool(event.modifiers() & Qt.KeyboardModifier.ShiftModifier)
+        # Hovering an existing point (snapped, no Shift) -> grab it to edit
+        # instead of starting/continuing a drawing.
+        if self._snap_handle is not None and not shift:
+            handle = self._snap_handle
+            self._cancel_in_progress()
+            self._begin_edit_snapped(handle)
+            return
         sp = self.mapToScene(event.position().toPoint())
         self._pts.append(Pt(sp.x(), sp.y()))
         if len(self._pts) >= _NEEDED[self._tool]:
@@ -340,50 +388,141 @@ class MeasureView(QGraphicsView):
             self._draw_preview(Pt(sp.x(), sp.y()))
 
     def mouseMoveEvent(self, event) -> None:  # noqa: N802
+        # Owning a snapped-point drag: move it directly, don't pass to base.
+        if self._drag_handle is not None and self._pixmap_item is not None:
+            if event.buttons() & Qt.MouseButton.LeftButton:
+                sp = self.mapToScene(event.position().toPoint())
+                self._drag_handle.setPos(sp)
+                self._show_loupes(sp)
+            return
         super().mouseMoveEvent(event)
         if self._pixmap_item is None:
             return
         sp = self.mapToScene(event.position().toPoint())
         if self._tool == Tool.PAN:
             if self._editing and (event.buttons() & Qt.MouseButton.LeftButton):
-                self._show_mag(sp)
+                self._show_loupes(sp)
             else:
-                self._mag.hide()
+                self._hide_loupes()
             return
         if self._tool == Tool.SELECT:
-            # show the loupe while dragging a handle so endpoints can be placed precisely
             if event.buttons() & Qt.MouseButton.LeftButton:
-                self._show_mag(sp)
+                self._show_loupes(sp)
             else:
-                self._mag.hide()
+                self._hide_loupes()
             return
-        self._show_mag(sp)
-        if self._pts:
-            self._draw_preview(Pt(sp.x(), sp.y()))
+        # a drawing tool is active: snap to nearby points, show loupes + preview
+        shift = bool(event.modifiers() & Qt.KeyboardModifier.ShiftModifier)
+        self._update_snap(event.position().toPoint(), shift)
+        target = QPointF(self._snap_scene.x, self._snap_scene.y) if self._snap_scene else sp
+        self._show_loupes(target)
+        self._draw_preview(Pt(target.x(), target.y()))
 
-    def _show_mag(self, scene_pt) -> None:
+    def _show_loupes(self, scene_pt) -> None:
         self._mag.update_point(scene_pt)
         self._mag.move(self.viewport().width() - self._mag.width() - 10, 10)
         self._mag.raise_()
         self._mag.show()
+        vp = self.mapFromScene(scene_pt)
+        self._loupe.update_point(scene_pt)
+        x = max(0, min(vp.x() + 18, self.viewport().width() - self._loupe.width()))
+        y = max(0, min(vp.y() - self._loupe.height() - 18, self.viewport().height() - self._loupe.height()))
+        self._loupe.move(x, y)
+        self._loupe.raise_()
+        self._loupe.show()
+
+    def _hide_loupes(self) -> None:
+        self._mag.hide()
+        self._loupe.hide()
 
     def mouseReleaseEvent(self, event) -> None:  # noqa: N802
+        if self._drag_handle is not None:
+            self._drag_handle = None
+            self._hide_loupes()
+            super().mouseReleaseEvent(event)
+            return
         super().mouseReleaseEvent(event)
         if self._tool == Tool.PAN and self._editing:
             self._editing = False
             self.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
-            self._mag.hide()
+            self._hide_loupes()
 
     def leaveEvent(self, event) -> None:  # noqa: N802
-        self._mag.hide()
+        self._hide_loupes()
         super().leaveEvent(event)
 
     def keyPressEvent(self, event) -> None:  # noqa: N802
-        if event.key() == Qt.Key.Key_Escape:
+        key = event.key()
+        if key == Qt.Key.Key_Escape:
             self._cancel_in_progress()
-        elif event.key() in (Qt.Key.Key_Delete, Qt.Key.Key_Backspace):
+        elif key in (Qt.Key.Key_Delete, Qt.Key.Key_Backspace):
             self.delete_selected()
+        elif key == Qt.Key.Key_Left:
+            self.navigate.emit(-1)
+            return
+        elif key == Qt.Key.Key_Right:
+            self.navigate.emit(1)
+            return
         super().keyPressEvent(event)
+
+    # ------------------------------------------------------------- snapping
+    def _all_handles(self) -> list[Handle]:
+        handles: list[Handle] = []
+        for m in self._measurements.values():
+            handles.extend(m.handles)
+        if self._origin is not None:
+            handles.extend(self._origin.handles)
+        return handles
+
+    def _owner_of_handle(self, handle: Handle) -> BaseMeasurement | None:
+        for m in self._measurements.values():
+            if handle in m.handles:
+                return m
+        if self._origin is not None and handle in self._origin.handles:
+            return self._origin
+        return None
+
+    def _update_snap(self, vp_pos, shift: bool) -> None:
+        self._snap_handle = None
+        self._snap_scene = None
+        if shift:
+            return
+        best: Handle | None = None
+        best_d = self._SNAP_PX
+        for h in self._all_handles():
+            hv = self.mapFromScene(h.scenePos())
+            d = math.hypot(hv.x() - vp_pos.x(), hv.y() - vp_pos.y())
+            if d <= best_d:
+                best_d = d
+                best = h
+        if best is not None:
+            self._snap_handle = best
+            self._snap_scene = best.point()
+
+    def _begin_edit_snapped(self, handle: Handle) -> None:
+        self.set_tool(Tool.SELECT)
+        self.tool_changed.emit(Tool.SELECT)
+        for it in self._scene.selectedItems():
+            it.setSelected(False)
+        owner = self._owner_of_handle(handle)
+        if owner is not None and owner.lines:
+            owner.lines[0].setSelected(True)
+        # grab it immediately so the same click-drag moves the point
+        self._drag_handle = handle
+        self.status.emit("Moving point — release to drop (it stays linked).")
+
+    def _snap_ring(self, p: Pt) -> QGraphicsEllipseItem:
+        r = 8
+        ring = QGraphicsEllipseItem(-r, -r, 2 * r, 2 * r)
+        pen = QPen(QColor(255, 255, 255))
+        pen.setWidth(2)
+        pen.setCosmetic(True)
+        ring.setPen(pen)
+        ring.setBrush(Qt.BrushStyle.NoBrush)
+        ring.setPos(p.x, p.y)
+        ring.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIgnoresTransformations, True)
+        ring.setZValue(40)
+        return ring
 
     # -------------------------------------------------------------- preview
     def _add_preview(self, item: QGraphicsItem) -> None:
@@ -423,6 +562,8 @@ class MeasureView(QGraphicsView):
                 lbl.set_text(f"{ang:.2f}°")
                 lbl.set_anchor(cursor)
                 self._add_preview(lbl)
+        if self._snap_scene is not None:
+            self._add_preview(self._snap_ring(self._snap_scene))
 
     def _dist_preview_label(self, a: Pt, b: Pt) -> items.LabelItem:
         px = g.distance(a, b)

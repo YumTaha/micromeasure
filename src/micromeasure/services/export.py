@@ -5,7 +5,7 @@ from pathlib import Path
 
 from micromeasure.services.measurements import Measurement
 
-_HEADER = ["Index", "Image", "Part", "Operator", "Kind", "Value", "Unit", "Detail"]
+_HEADER = ["#", "Image", "Part", "Operator", "Kind", "Value", "Unit", "Detail"]
 
 
 def write_csv(rows: list[Measurement], path: Path) -> None:
@@ -14,5 +14,5 @@ def write_csv(rows: list[Measurement], path: Path) -> None:
         writer.writerow(_HEADER)
         for m in rows:
             writer.writerow(
-                [m.index, m.image, m.part, m.operator, m.kind, f"{m.value:.4f}", m.unit, m.detail]
+                [m.label, m.image, m.part, m.operator, m.kind, f"{m.value:.4f}", m.unit, m.detail]
             )
