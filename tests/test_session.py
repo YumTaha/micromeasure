@@ -33,6 +33,7 @@ def main() -> None:
 
     # --- session 1: draw on both images, then write the session file --------
     win = MainWindow(cfg, tmp / "config.toml")
+    win._guided = False  # exercise the generic navigation/session engine
     win._begin_session(paths)
     win._mm_per_px = 0.01
     win._view.set_scale(0.01)
@@ -48,6 +49,7 @@ def main() -> None:
 
     # --- session 2: fresh window, reopen the folder, load the session -------
     win2 = MainWindow(cfg, tmp / "config.toml")
+    win2._guided = False
     win2._folder = tmp
     win2._session_file = spath
     win2._paths = paths

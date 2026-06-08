@@ -34,6 +34,7 @@ def main() -> None:
 
     cfg = load_config(tmp / "config.toml")
     win = MainWindow(cfg, tmp / "config.toml")
+    win._guided = False  # exercise the generic navigation engine
     view = win._view
     win._begin_session(paths)
     view.set_scale(0.01)  # 1 px = 0.01 mm
@@ -72,7 +73,7 @@ def main() -> None:
     win._csv_path = csv
     win._do_autosave()
     lines = csv.read_text(encoding="utf-8-sig").strip().splitlines()
-    assert lines[0].split(",")[:2] == ["#", "Image"], lines[0]
+    assert lines[0].split(",")[:3] == ["Tooth", "#", "Image"], lines[0]
     assert "img1.png" in lines[1] and "img2.png" in lines[2]
 
     print("navigation: all checks passed")

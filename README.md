@@ -4,6 +4,24 @@ A lightweight image measurement tool (DinoCapture / Measuro style) for measuring
 on PNGs and other images — no microscope/camera required. Built for repeated,
 consistent readings (e.g. Gauge R&R studies).
 
+## Guided teeth lockdown mode (`--lockdown`)
+
+Run `uv run python main.py --lockdown` for a **locked workflow for measuring
+teeth across frames** (without the flag it runs the normal free-tool app):
+
+- **Origins are pre-set.** Do an origin pass first (normal mode: set the origin
+  on each frame, which auto-saves to the folder). Lockdown then **auto-loads the
+  origins** on open (and errors if none are found) — the operator never sets origin.
+- The schedule **repeats every 10 frames**: 6 teeth per block, each visible across
+  a 5-frame window. The painted numbers (1–6) repeat each block; the **CSV records
+  the real global tooth** (block×6 + painted), e.g. frames 11–20 → teeth 7–12.
+- On each frame, pick the **Tooth** (only the present painted ones are offered;
+  the dropdown shows `painted → #real`), then draw in fixed order:
+  **line 1 → line 2 → height point**. A big red **Undo** steps back within the
+  current tooth. **Next is blocked until every tooth on the frame is done.**
+- Each tooth produces 4 CSV rows (line1∠origin, line2∠origin, line1∠line2,
+  height), all carrying the **`Tooth`** column for per-tooth Gauge R&R.
+
 ## Run
 
 ```bash

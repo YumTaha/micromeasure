@@ -14,8 +14,8 @@ class Measurement:
     label: str
     image: str
     part: str
-    operator: str
     kind: str
     value: float
     unit: str
     detail: str
+    tooth: int = 0

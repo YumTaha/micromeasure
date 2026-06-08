@@ -82,6 +82,8 @@ class MeasureView(QGraphicsView):
     status = Signal(str)
     navigate = Signal(int)  # +1 / -1 from arrow keys
     tool_changed = Signal(object)  # Tool, when the view switches tools itself
+    origin_changed = Signal()  # origin created or moved
+    edit_finished = Signal()  # a snapped-point drag was released
 
     _SNAP_PX = 12.0  # cursor-to-handle snap radius, in screen pixels
 
@@ -107,6 +109,12 @@ class MeasureView(QGraphicsView):
         self._snap_handle: Handle | None = None
         self._snap_scene: Pt | None = None
         self._drag_handle: Handle | None = None  # snapped point grabbed for moving
+        self._auto_angle = False
+        self._last_line_mid: int | None = None
+        self._mid_pan = False  # middle-button temporary pan
+        self._mid_pan_last = None
+        self._lockdown = False  # hardened guided mode
+        self._editable_mids: set[int] = set()  # only these handles may be moved
 
         self._ctx = MeasureContext(
             scale_provider=lambda: self._mm_per_px,
@@ -125,6 +133,7 @@ class MeasureView(QGraphicsView):
         self._origin = None
         self._snap_handle = None
         self._snap_scene = None
+        self._last_line_mid = None
         self._pixmap_item = self._scene.addPixmap(pixmap)
         self._scene.setSceneRect(self._pixmap_item.boundingRect())
         self._mag.set_source(pixmap)
@@ -140,6 +149,22 @@ class MeasureView(QGraphicsView):
         self._mag.set_zoom(zoom)
         self._mag.setFixedSize(size, size)
         self._loupe.set_zoom(zoom)
+
+    def set_auto_angle(self, enabled: bool) -> None:
+        self._auto_angle = enabled
+        self._last_line_mid = None
+
+    def set_lockdown(self, enabled: bool) -> None:
+        self._lockdown = enabled
+
+    def set_editable_mids(self, mids) -> None:
+        """In lockdown, only handles owned by these measurement ids may move."""
+        self._editable_mids = set(mids)
+
+    def _lock_handles(self, m: BaseMeasurement) -> None:
+        if self._lockdown:
+            for h in m.handles:
+                h.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable, False)
 
     def has_origin(self) -> bool:
         return self._origin is not None
@@ -177,17 +202,21 @@ class MeasureView(QGraphicsView):
         if len(lines) != 2:
             self.status.emit("Select exactly 2 lines first (Select tool), then try again.")
             return False
-        m = AngleBetweenM(self._scene, self._ctx, lines[0], lines[1])
-        m.src_refs = (self._line_ref(lines[0]), self._line_ref(lines[1]))
+        self._create_between(lines[0], lines[1])
+        lines[0].setSelected(False)
+        lines[1].setSelected(False)
+        return True
+
+    def _create_between(self, la, lb) -> AngleBetweenM:
+        m = AngleBetweenM(self._scene, self._ctx, la, lb)
+        m.src_refs = (self._line_ref(la), self._line_ref(lb))
         m.mid = self._next_id
         self._next_id += 1
         m.notify = self._on_handle_moved
         m.recompute()
         self._measurements[m.mid] = m
         self.added.emit(m.mid, m.kind, m.value, m.unit, m.detail)
-        lines[0].setSelected(False)
-        lines[1].setSelected(False)
-        return True
+        return m
 
     def _line_ref(self, line) -> tuple[int, int]:
         for m in self._measurements.values():
@@ -225,6 +254,18 @@ class MeasureView(QGraphicsView):
                 del self._measurements[mid]
                 self.removed.emit(mid)
 
+    def remove_origin(self) -> None:
+        if self._origin is not None:
+            self._origin.remove()
+            self._origin = None
+
+    def remove_measurement(self, mid: int) -> None:
+        """Remove a single measurement by id (used by guided Undo)."""
+        m = self._measurements.pop(mid, None)
+        if m is not None:
+            m.remove()
+            self.removed.emit(mid)
+
     def clear_measurements(self) -> None:
         for mid, m in list(self._measurements.items()):
             m.remove()
@@ -233,21 +274,32 @@ class MeasureView(QGraphicsView):
         self._cancel_in_progress()
 
     # --------------------------------------------------------- measurements
-    def _create(self, factory: type[BaseMeasurement], pts: list[Pt]) -> None:
+    def _create(self, factory: type[BaseMeasurement], pts: list[Pt]) -> BaseMeasurement:
         m = factory(self._scene, pts, self._ctx)
+        self._lock_handles(m)
         m.mid = self._next_id
         self._next_id += 1
         m.notify = self._on_handle_moved
         m.recompute()
         self._measurements[m.mid] = m
         self.added.emit(m.mid, m.kind, m.value, m.unit, m.detail)
+        return m
 
     def _make_origin(self, pts: list[Pt]) -> None:
         if self._origin is not None:
             self._origin.remove()
         self._origin = OriginM(self._scene, pts, self._ctx)
+        self._lock_handles(self._origin)
         self._origin.notify = self._on_handle_moved
         self._origin.recompute()
+        self.origin_changed.emit()
+
+    def create_between_lines(self, mid_a: int, mid_b: int) -> AngleBetweenM | None:
+        a = self._measurements.get(mid_a)
+        b = self._measurements.get(mid_b)
+        if a is not None and b is not None and a.lines and b.lines:
+            return self._create_between(a.lines[0], b.lines[0])
+        return None
 
     def _set_origin(self, pts: list[Pt]) -> None:
         self._make_origin(pts)
@@ -280,6 +332,7 @@ class MeasureView(QGraphicsView):
 
     def _rebuild_one(self, r) -> None:
         m = _TAG_FACTORY[r.tag](self._scene, list(r.points), self._ctx)
+        self._lock_handles(m)
         m.mid = r.mid
         m.notify = self._on_handle_moved
         m.recompute()
@@ -349,6 +402,15 @@ class MeasureView(QGraphicsView):
         if self._pixmap_item is None:
             super().mousePressEvent(event)
             return
+        if event.button() == Qt.MouseButton.MiddleButton:
+            # hold middle button to temporarily pan; release returns to the tool
+            self._mid_pan = True
+            self._mid_pan_last = event.position().toPoint()
+            self.viewport().setCursor(Qt.CursorShape.ClosedHandCursor)
+            self._cancel_in_progress()
+            self._hide_loupes()
+            event.accept()
+            return
         if self._tool == Tool.SELECT:
             # Click a line to toggle its selection (additive: pick two easily);
             # click empty space to clear; click a handle to drag it.
@@ -388,6 +450,14 @@ class MeasureView(QGraphicsView):
             self._draw_preview(Pt(sp.x(), sp.y()))
 
     def mouseMoveEvent(self, event) -> None:  # noqa: N802
+        if self._mid_pan:
+            pos = event.position().toPoint()
+            if self._mid_pan_last is not None:
+                d = pos - self._mid_pan_last
+                self.horizontalScrollBar().setValue(self.horizontalScrollBar().value() - d.x())
+                self.verticalScrollBar().setValue(self.verticalScrollBar().value() - d.y())
+            self._mid_pan_last = pos
+            return
         # Owning a snapped-point drag: move it directly, don't pass to base.
         if self._drag_handle is not None and self._pixmap_item is not None:
             if event.buttons() & Qt.MouseButton.LeftButton:
@@ -435,11 +505,24 @@ class MeasureView(QGraphicsView):
         self._mag.hide()
         self._loupe.hide()
 
+    def _restore_cursor(self) -> None:
+        if self._tool == Tool.PAN:
+            self.viewport().setCursor(Qt.CursorShape.OpenHandCursor)
+        else:
+            self.viewport().setCursor(self._dot_cursor)
+
     def mouseReleaseEvent(self, event) -> None:  # noqa: N802
+        if event.button() == Qt.MouseButton.MiddleButton and self._mid_pan:
+            self._mid_pan = False
+            self._mid_pan_last = None
+            self._restore_cursor()
+            event.accept()
+            return
         if self._drag_handle is not None:
             self._drag_handle = None
             self._hide_loupes()
             super().mouseReleaseEvent(event)
+            self.edit_finished.emit()
             return
         super().mouseReleaseEvent(event)
         if self._tool == Tool.PAN and self._editing:
@@ -456,7 +539,8 @@ class MeasureView(QGraphicsView):
         if key == Qt.Key.Key_Escape:
             self._cancel_in_progress()
         elif key in (Qt.Key.Key_Delete, Qt.Key.Key_Backspace):
-            self.delete_selected()
+            if not self._lockdown:  # deletion is disabled in lockdown
+                self.delete_selected()
         elif key == Qt.Key.Key_Left:
             self.navigate.emit(-1)
             return
@@ -482,14 +566,21 @@ class MeasureView(QGraphicsView):
             return self._origin
         return None
 
+    def _handle_editable(self, handle: Handle) -> bool:
+        owner = self._owner_of_handle(handle)
+        return owner is not None and owner.mid in self._editable_mids
+
     def _update_snap(self, vp_pos, shift: bool) -> None:
         self._snap_handle = None
         self._snap_scene = None
         if shift:
             return
+        handles = self._all_handles()
+        if self._lockdown:
+            handles = [h for h in handles if self._handle_editable(h)]
         best: Handle | None = None
         best_d = self._SNAP_PX
-        for h in self._all_handles():
+        for h in handles:
             hv = self.mapFromScene(h.scenePos())
             d = math.hypot(hv.x() - vp_pos.x(), hv.y() - vp_pos.y())
             if d <= best_d:
@@ -581,5 +672,11 @@ class MeasureView(QGraphicsView):
         self._cancel_in_progress()
         if tool == Tool.SET_ORIGIN:
             self._set_origin(pts)
-        else:
-            self._create(_FACTORY[tool], pts)
+            return
+        m = self._create(_FACTORY[tool], pts)
+        # auto-angle: pair each new single-line measurement with the previous one
+        if self._auto_angle and tool in (Tool.DISTANCE, Tool.LINE_REL):
+            prev = self._measurements.get(self._last_line_mid) if self._last_line_mid else None
+            if prev is not None and prev.lines and m.lines:
+                self._create_between(prev.lines[0], m.lines[0])
+            self._last_line_mid = m.mid
