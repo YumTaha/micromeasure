@@ -67,26 +67,31 @@ def main() -> None:
     perp = [m for m in view._measurements.values() if isinstance(m, PointPerpM)][0]
     assert approx(perp.value, 0.31835, 1e-3), perp.value
 
-    # --- angle between two selected lines -------------------------------
+    # --- angle between two selected lines (linked, no duplicates) -------
     view._create(DistanceM, [Pt(0, 0), Pt(100, 0)])  # horizontal
     view._create(DistanceM, [Pt(0, 0), Pt(0, -100)])  # vertical
-    lines = sorted(view._measurements.values(), key=lambda m: m.mid)[-2:]
-    lines[0].lines[0].setSelected(True)
-    lines[1].lines[0].setSelected(True)
+    src_h, src_v = sorted(view._measurements.values(), key=lambda m: m.mid)[-2:]
+    src_h.lines[0].setSelected(True)
+    src_v.lines[0].setSelected(True)
     n_before = len(view._measurements)
     assert view.angle_between_selected()
     assert len(view._measurements) == n_before + 1
-    new = max(view._measurements.values(), key=lambda m: m.mid)
-    assert approx(new.value, 90.0), new.value
+    between = max(view._measurements.values(), key=lambda m: m.mid)
+    assert approx(between.value, 90.0), between.value
+    assert not between.handles  # linked annotation creates no duplicate points
 
-    # --- delete selected -------------------------------------------------
+    # moving an ORIGINAL line endpoint updates the linked angle
+    src_v.handles[1].setPos(QPointF(100, -100))  # vertical -> 45-deg diagonal
+    assert approx(between.value, 45.0, 0.5), between.value
+
+    # --- delete selected (select the linked arc) ------------------------
     rows_before = win._table.rowCount()
-    for ln in view._scene.selectedItems():
-        ln.setSelected(False)
-    new.lines[0].setSelected(True)
+    for it in view._scene.selectedItems():
+        it.setSelected(False)
+    between.selectables[0].setSelected(True)
     view.delete_selected()
     assert win._table.rowCount() == rows_before - 1
-    assert new.mid not in view._measurements
+    assert between.mid not in view._measurements
 
     # --- 4-point angle is direction-independent (~60 deg, not 120) ------
     import math as _m

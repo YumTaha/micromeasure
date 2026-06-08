@@ -12,6 +12,7 @@ from micromeasure.services.geometry import Pt
 from micromeasure.ui import items
 from micromeasure.ui.graphics_measure import (
     Angle4M,
+    AngleBetweenM,
     BaseMeasurement,
     DistanceM,
     Handle,
@@ -45,6 +46,12 @@ _FACTORY: dict[Tool, type[BaseMeasurement]] = {
     Tool.ANGLE4: Angle4M,
     Tool.LINE_REL: RelAngleM,
     Tool.POINT_PERP: PointPerpM,
+}
+_TAG_FACTORY: dict[str, type[BaseMeasurement]] = {
+    "distance": DistanceM,
+    "angle4": Angle4M,
+    "rel": RelAngleM,
+    "perp": PointPerpM,
 }
 
 
@@ -103,6 +110,12 @@ class MeasureView(QGraphicsView):
     def has_origin(self) -> bool:
         return self._origin is not None
 
+    def next_id(self) -> int:
+        return self._next_id
+
+    def set_next_id(self, value: int) -> None:
+        self._next_id = max(self._next_id, value)
+
     def set_tool(self, tool: Tool) -> None:
         if tool in (Tool.LINE_REL, Tool.POINT_PERP) and self._origin is None:
             self.status.emit("Set an origin line first (Set Origin tool).")
@@ -116,27 +129,61 @@ class MeasureView(QGraphicsView):
         else:
             self.setDragMode(QGraphicsView.DragMode.NoDrag)
 
+    def selected_line_count(self) -> int:
+        return len([it for it in self._scene.selectedItems() if isinstance(it, items.MeasureLine)])
+
     def angle_between_selected(self) -> bool:
         lines = [it for it in self._scene.selectedItems() if isinstance(it, items.MeasureLine)]
         if len(lines) != 2:
             self.status.emit("Select exactly 2 lines first (Select tool), then try again.")
             return False
-        a1, b1 = lines[0].endpoints()
-        a2, b2 = lines[1].endpoints()
-        self._create(Angle4M, [a1, b1, a2, b2])
+        m = AngleBetweenM(self._scene, self._ctx, lines[0], lines[1])
+        m.src_refs = (self._line_ref(lines[0]), self._line_ref(lines[1]))
+        m.mid = self._next_id
+        self._next_id += 1
+        m.notify = self._on_handle_moved
+        m.recompute()
+        self._measurements[m.mid] = m
+        self.added.emit(m.mid, m.kind, m.value, m.unit, m.detail)
+        lines[0].setSelected(False)
+        lines[1].setSelected(False)
         return True
 
+    def _line_ref(self, line) -> tuple[int, int]:
+        for m in self._measurements.values():
+            if line in m.lines:
+                return (m.mid, m.lines.index(line))
+        if self._origin is not None and line in self._origin.lines:
+            return (0, self._origin.lines.index(line))
+        return (0, 0)
+
     def delete_selected(self) -> None:
+        removed_lines: set = set()
         for mid, m in list(self._measurements.items()):
             if m.is_selected():
+                removed_lines.update(m.lines)
                 m.remove()
                 del self._measurements[mid]
                 self.removed.emit(mid)
+        origin_removed = False
         if self._origin is not None and self._origin.is_selected():
+            removed_lines.update(self._origin.lines)
             self._origin.remove()
             self._origin = None
+            origin_removed = True
+        if removed_lines:
+            self._remove_dependent_angles(removed_lines)
+        if origin_removed:
             self._recompute_all()
             self.status.emit("Origin removed.")
+
+    def _remove_dependent_angles(self, lines: set) -> None:
+        """Remove linked angle annotations whose source lines were deleted."""
+        for mid, m in list(self._measurements.items()):
+            if isinstance(m, AngleBetweenM) and any(s in lines for s in m.sources()):
+                m.remove()
+                del self._measurements[mid]
+                self.removed.emit(mid)
 
     def clear_measurements(self) -> None:
         for mid, m in list(self._measurements.items()):
@@ -155,13 +202,73 @@ class MeasureView(QGraphicsView):
         self._measurements[m.mid] = m
         self.added.emit(m.mid, m.kind, m.value, m.unit, m.detail)
 
-    def _set_origin(self, pts: list[Pt]) -> None:
+    def _make_origin(self, pts: list[Pt]) -> None:
         if self._origin is not None:
             self._origin.remove()
         self._origin = OriginM(self._scene, pts, self._ctx)
         self._origin.notify = self._on_handle_moved
         self._origin.recompute()
+
+    def _set_origin(self, pts: list[Pt]) -> None:
+        self._make_origin(pts)
         self.status.emit("Origin set. Use 'Angle vs Origin' or 'Point to Origin'.")
+
+    # ---------------------------------------------------- per-image save/load
+    def capture_state(self):
+        """Snapshot the current drawings + origin so they can be restored."""
+        records = [m.to_record() for m in self._measurements.values()]
+        origin = self._origin.as_line() if self._origin is not None else None
+        return records, origin
+
+    def apply_state(self, records, origin_pts) -> None:
+        """Rebuild drawings + origin (after set_image cleared the scene). Reuses
+        the stored ids so rows stay linked; emits `changed`, never `added`."""
+        if origin_pts is not None:
+            self._make_origin([origin_pts[0], origin_pts[1]])
+        betweens = []
+        for r in records:
+            if r.tag == "between":
+                betweens.append(r)
+            else:
+                self._rebuild_one(r)
+        for r in betweens:
+            self._rebuild_between(r)
+
+    def _track_id(self, mid: int) -> None:
+        if mid >= self._next_id:
+            self._next_id = mid + 1
+
+    def _rebuild_one(self, r) -> None:
+        m = _TAG_FACTORY[r.tag](self._scene, list(r.points), self._ctx)
+        m.mid = r.mid
+        m.notify = self._on_handle_moved
+        m.recompute()
+        self._measurements[m.mid] = m
+        self._track_id(m.mid)
+        self.changed.emit(m.mid, m.value, m.unit, m.detail)
+
+    def _rebuild_between(self, r) -> None:
+        la = self._resolve_ref(r.src[0])
+        lb = self._resolve_ref(r.src[1])
+        if la is None or lb is None:
+            return
+        m = AngleBetweenM(self._scene, self._ctx, la, lb)
+        m.src_refs = r.src
+        m.mid = r.mid
+        m.notify = self._on_handle_moved
+        m.recompute()
+        self._measurements[m.mid] = m
+        self._track_id(m.mid)
+        self.changed.emit(m.mid, m.value, m.unit, m.detail)
+
+    def _resolve_ref(self, ref: tuple[int, int]):
+        mid, idx = ref
+        if mid == 0:
+            lines = self._origin.lines if self._origin is not None else []
+        else:
+            owner = self._measurements.get(mid)
+            lines = owner.lines if owner is not None else []
+        return lines[idx] if idx < len(lines) else None
 
     def _on_handle_moved(self, _changed: BaseMeasurement) -> None:
         self._recompute_all()
@@ -169,7 +276,15 @@ class MeasureView(QGraphicsView):
     def _recompute_all(self) -> None:
         if self._origin is not None:
             self._origin.recompute()
+        # recompute source measurements first, then linked angles that read them
+        deferred: list[tuple[int, BaseMeasurement]] = []
         for mid, m in self._measurements.items():
+            if isinstance(m, AngleBetweenM):
+                deferred.append((mid, m))
+                continue
+            m.recompute()
+            self.changed.emit(mid, m.value, m.unit, m.detail)
+        for mid, m in deferred:
             m.recompute()
             self.changed.emit(mid, m.value, m.unit, m.detail)
 

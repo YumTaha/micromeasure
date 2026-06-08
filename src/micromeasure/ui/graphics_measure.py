@@ -16,6 +16,20 @@ _MOVABLE = QGraphicsItem.GraphicsItemFlag.ItemIsMovable
 _SENDS_GEOM = QGraphicsItem.GraphicsItemFlag.ItemSendsGeometryChanges
 _POS_CHANGED = QGraphicsItem.GraphicsItemChange.ItemPositionHasChanged
 
+# A line reference for linked angles: (measurement-id, line-index). The origin
+# uses the reserved id 0.
+LineRef = tuple[int, int]
+
+
+@dataclass
+class MRecord:
+    """Serializable snapshot of one measurement (for per-image save/restore)."""
+
+    mid: int
+    tag: str
+    points: list[Pt]
+    src: tuple[LineRef, LineRef] | None = None
+
 
 @dataclass
 class MeasureContext:
@@ -61,6 +75,7 @@ class Handle(QGraphicsEllipseItem):
 
 class BaseMeasurement:
     kind = "?"
+    tag = "?"
 
     def __init__(self, scene: QGraphicsScene, pts: list[Pt], ctx: MeasureContext) -> None:
         self._scene = scene
@@ -73,6 +88,7 @@ class BaseMeasurement:
         self._items: list[QGraphicsItem] = []
         self.handles: list[Handle] = []
         self.lines: list[items.MeasureLine] = []
+        self.selectables: list[QGraphicsItem] = []
         self._build(pts)
 
     # -- helpers ----------------------------------------------------------
@@ -92,6 +108,7 @@ class BaseMeasurement:
         self._scene.addItem(ln)
         self._items.append(ln)
         self.lines.append(ln)
+        self.selectables.append(ln)
         return ln
 
     def _add_label(self, color: QColor) -> items.LabelItem:
@@ -108,7 +125,7 @@ class BaseMeasurement:
             self.notify(self)
 
     def is_selected(self) -> bool:
-        return any(ln.isSelected() for ln in self.lines)
+        return any(s.isSelected() for s in self.selectables)
 
     def remove(self) -> None:
         for it in self._items + self.handles:
@@ -121,6 +138,9 @@ class BaseMeasurement:
     def line_for_selection(self) -> tuple[Pt, Pt] | None:
         return None
 
+    def to_record(self) -> MRecord:
+        return MRecord(mid=self.mid, tag=self.tag, points=self.pts())
+
     # -- subclass hooks ---------------------------------------------------
     def _build(self, pts: list[Pt]) -> None:
         raise NotImplementedError
@@ -131,6 +151,7 @@ class BaseMeasurement:
 
 class DistanceM(BaseMeasurement):
     kind = KIND_DISTANCE
+    tag = "distance"
 
     def _build(self, pts: list[Pt]) -> None:
         self._line = self._add_line(items.COLOR_DISTANCE)
@@ -170,8 +191,36 @@ def _extension(a: Pt, b: Pt, inter: Pt) -> tuple[Pt, Pt] | None:
     return near, inter
 
 
+def _apply_extension(line, a: Pt, b: Pt, inter: Pt | None) -> None:
+    ext = _extension(a, b, inter) if inter is not None else None
+    if ext is None:
+        line.setVisible(False)
+    else:
+        line.setLine(ext[0].x, ext[0].y, ext[1].x, ext[1].y)
+        line.setVisible(True)
+
+
+def _angle_geometry(a1: Pt, b1: Pt, a2: Pt, b2: Pt):
+    """Return (value_deg, center, v1, v2) for the angle between lines a1-b1 and
+    a2-b2, using rays from the intersection toward each line's far endpoint."""
+    value = g.angle_at_vertex(a1, b1, a2, b2)
+    inter = g.line_intersection(a1, b1, a2, b2)
+    if inter is None:
+        center = g.midpoint(g.midpoint(a1, b1), g.midpoint(a2, b2))
+        v1 = Pt(b1.x - a1.x, b1.y - a1.y)
+        v2 = Pt(b2.x - a2.x, b2.y - a2.y)
+    else:
+        center = inter
+        e1 = a1 if g.distance(inter, a1) >= g.distance(inter, b1) else b1
+        e2 = a2 if g.distance(inter, a2) >= g.distance(inter, b2) else b2
+        v1 = Pt(e1.x - inter.x, e1.y - inter.y)
+        v2 = Pt(e2.x - inter.x, e2.y - inter.y)
+    return value, center, v1, v2, inter
+
+
 class Angle4M(BaseMeasurement):
     kind = KIND_ANGLE
+    tag = "angle4"
 
     def _build(self, pts: list[Pt]) -> None:
         faded = QColor(items.COLOR_ANGLE)
@@ -189,37 +238,18 @@ class Angle4M(BaseMeasurement):
         p1, p2, p3, p4 = self.pts()
         self._l1.set_pts(p1, p2)
         self._l2.set_pts(p3, p4)
-        self.value = g.angle_at_vertex(p1, p2, p3, p4)
         self.unit, self.detail = "°", "angle between 2 lines"
-        inter = g.line_intersection(p1, p2, p3, p4)
-        if inter is None:
-            center = g.midpoint(g.midpoint(p1, p2), g.midpoint(p3, p4))
-            v1 = Pt(p2.x - p1.x, p2.y - p1.y)
-            v2 = Pt(p4.x - p3.x, p4.y - p3.y)
-        else:
-            center = inter
-            e1 = p1 if g.distance(inter, p1) >= g.distance(inter, p2) else p2
-            e2 = p3 if g.distance(inter, p3) >= g.distance(inter, p4) else p4
-            v1 = Pt(e1.x - inter.x, e1.y - inter.y)
-            v2 = Pt(e2.x - inter.x, e2.y - inter.y)
-        self._set_extension(self._ext1, p1, p2, inter)
-        self._set_extension(self._ext2, p3, p4, inter)
+        self.value, center, v1, v2, inter = _angle_geometry(p1, p2, p3, p4)
+        _apply_extension(self._ext1, p1, p2, inter)
+        _apply_extension(self._ext2, p3, p4, inter)
         self._arc.setPath(items.arc_path(center, v1, v2))
         self._label.set_text(f"{self.value:.2f}°")
         self._label.set_anchor(center)
 
-    @staticmethod
-    def _set_extension(line, a: Pt, b: Pt, inter: Pt | None) -> None:
-        ext = _extension(a, b, inter) if inter is not None else None
-        if ext is None:
-            line.setVisible(False)
-        else:
-            line.setLine(ext[0].x, ext[0].y, ext[1].x, ext[1].y)
-            line.setVisible(True)
-
 
 class RelAngleM(BaseMeasurement):
     kind = KIND_REL_ANGLE
+    tag = "rel"
 
     def _build(self, pts: list[Pt]) -> None:
         self._line = self._add_line(items.COLOR_REL)
@@ -247,6 +277,7 @@ class RelAngleM(BaseMeasurement):
 
 class PointPerpM(BaseMeasurement):
     kind = KIND_PERP
+    tag = "perp"
 
     def _build(self, pts: list[Pt]) -> None:
         self._foot = self._add(items.make_line(pts[0], pts[0], items.COLOR_PERP, dashed=True))
@@ -279,6 +310,7 @@ class OriginM(BaseMeasurement):
     """The reference line. Editable, but not reported as a reading."""
 
     kind = "origin"
+    tag = "origin"
 
     def _build(self, pts: list[Pt]) -> None:
         self._line = self._add_line(items.COLOR_ORIGIN, width=3)
@@ -298,3 +330,54 @@ class OriginM(BaseMeasurement):
 
     def line_for_selection(self) -> tuple[Pt, Pt] | None:
         return tuple(self.pts())  # type: ignore[return-value]
+
+
+class AngleBetweenM(BaseMeasurement):
+    """Angle between two EXISTING lines. Creates no new draggable points; it
+    reads the two source lines live, so moving an original endpoint updates it.
+    The arc itself is selectable (for deletion)."""
+
+    kind = KIND_ANGLE
+    tag = "between"
+
+    def __init__(self, scene: QGraphicsScene, ctx: MeasureContext, la, lb) -> None:
+        self._la = la
+        self._lb = lb
+        self.src_refs: tuple[LineRef, LineRef] | None = None
+        super().__init__(scene, [], ctx)
+
+    def to_record(self) -> MRecord:
+        return MRecord(mid=self.mid, tag=self.tag, points=[], src=self.src_refs)
+
+    def _build(self, pts: list[Pt]) -> None:
+        faded = QColor(items.COLOR_ANGLE)
+        faded.setAlpha(110)
+        self._ext1 = self._add(items.make_line(Pt(0, 0), Pt(0, 0), faded, width=1, dashed=True))
+        self._ext2 = self._add(items.make_line(Pt(0, 0), Pt(0, 0), faded, width=1, dashed=True))
+        self._arc = items.MeasureArc(items.COLOR_ANGLE)
+        self._scene.addItem(self._arc)
+        self._items.append(self._arc)
+        self.selectables.append(self._arc)
+        self._label = self._add_label(items.COLOR_ANGLE)
+
+    def sources(self) -> tuple[object, object]:
+        return self._la, self._lb
+
+    def alive(self) -> bool:
+        try:
+            return self._la.scene() is not None and self._lb.scene() is not None
+        except RuntimeError:
+            return False
+
+    def recompute(self) -> None:
+        if not self.alive():
+            return
+        a1, b1 = self._la.endpoints()
+        a2, b2 = self._lb.endpoints()
+        self.unit, self.detail = "°", "angle between 2 lines (linked)"
+        self.value, center, v1, v2, inter = _angle_geometry(a1, b1, a2, b2)
+        _apply_extension(self._ext1, a1, b1, inter)
+        _apply_extension(self._ext2, a2, b2, inter)
+        self._arc.set_arc(center, v1, v2)
+        self._label.set_text(f"{self.value:.2f}°")
+        self._label.set_anchor(center)

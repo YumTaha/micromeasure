@@ -112,6 +112,38 @@ class LabelItem(QGraphicsItemGroup):
         self.setPos(p.x, p.y)
 
 
+class MeasureArc(QGraphicsPathItem):
+    """A selectable arc (used by the linked angle-between annotation) with a fat
+    hit area and a selection highlight."""
+
+    def __init__(self, color: QColor, width: int = 2) -> None:
+        super().__init__()
+        self._color = color
+        self._w = width
+        self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable, True)
+        self.setZValue(6)
+
+    def set_arc(self, center: Pt, v1: Pt, v2: Pt) -> None:
+        self.prepareGeometryChange()
+        self.setPath(arc_path(center, v1, v2))
+
+    def shape(self) -> QPainterPath:
+        stroker = QPainterPathStroker()
+        stroker.setWidth(12.0)
+        return stroker.createStroke(self.path())
+
+    def boundingRect(self):  # noqa: ANN201 (Qt override)
+        return self.shape().boundingRect()
+
+    def paint(self, painter, option, widget=None) -> None:  # noqa: N802
+        selected = self.isSelected()
+        pen = QPen(COLOR_SELECTED if selected else self._color)
+        pen.setCosmetic(True)
+        pen.setWidth(self._w + (2 if selected else 0))
+        painter.setPen(pen)
+        painter.drawPath(self.path())
+
+
 class MeasureLine(QGraphicsLineItem):
     """A selectable line that highlights when selected and has a fat hit area so
     it is easy to click."""

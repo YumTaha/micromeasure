@@ -13,7 +13,16 @@ uv run python main.py
 
 ## Features
 
-- **Open** any PNG/JPG/BMP/TIFF; zoom with the mouse wheel, pan with the Pan tool.
+- **Open Folder** → step through every image with the bottom arrows or
+  PageUp/PageDown. The **origin carries** to the next image (just reposition it);
+  each image remembers its own drawings, so going back restores them. Readings
+  accumulate across all images into one CSV (with an `Image` column, and the
+  Part field auto-filled with the filename).
+- **Drawing backup** — every drawing auto-saves to `micromeasure_session.json`
+  inside the folder. Reopen that folder later and the app offers to redraw
+  everything, so you can visually QC what an operator measured.
+- **Tool visibility** — show/hide tools via the `[tools]` table in `config.toml`.
+- **Open** a single PNG/JPG/BMP/TIFF; zoom with the mouse wheel, pan with the Pan tool.
 - **Cursor magnifier** — a zoomed loupe follows the cursor in any measure tool so
   you can place points precisely.
 - **Set Scale** — enter mm-per-pixel (e.g. `0.006367`); distances then read in mm.

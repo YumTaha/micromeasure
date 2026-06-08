@@ -11,9 +11,9 @@ KIND_PERP = "perp_to_origin"
 @dataclass(frozen=True)
 class Measurement:
     index: int
+    image: str
     part: str
     operator: str
-    trial: int
     kind: str
     value: float
     unit: str
