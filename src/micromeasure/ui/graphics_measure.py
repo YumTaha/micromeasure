@@ -270,7 +270,7 @@ class RelAngleM(BaseMeasurement):
             self._label.set_text(f"#{self.display_id()}  (no origin)")
         else:
             rel = g.relative_angle_deg(origin[0], origin[1], a, b)
-            self.value = g.fold_to_axis(rel)
+            self.value = -g.fold_to_axis(rel)  # flipped sign convention
             self.unit, self.detail = "°", "vs origin (folded ±45)"
             self._label.set_text(f"#{self.display_id()}  {self.value:+.2f}°")
         self._label.set_anchor(g.midpoint(a, b))

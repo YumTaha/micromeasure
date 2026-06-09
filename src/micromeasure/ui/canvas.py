@@ -632,7 +632,7 @@ class MeasureView(QGraphicsView):
             self._add_preview(items.make_line(pts[0], cursor, color))
             if tool == Tool.LINE_REL and self._origin is not None:
                 o = self._origin.as_line()
-                rel = g.fold_to_axis(g.relative_angle_deg(o[0], o[1], pts[0], cursor))
+                rel = -g.fold_to_axis(g.relative_angle_deg(o[0], o[1], pts[0], cursor))
                 lbl = items.LabelItem(color)
                 lbl.set_text(f"{rel:+.2f}°")
                 lbl.set_anchor(g.midpoint(pts[0], cursor))
