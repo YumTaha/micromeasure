@@ -1,55 +1,48 @@
 # MicroMeasure
 
-A lightweight image measurement tool (DinoCapture / Measuro style) for measuring
-on PNGs and other images — no microscope/camera required. Built for repeated,
-consistent readings (e.g. Gauge R&R studies).
+Precision image measurement tool for quality and inspection work — measure distances, angles, and origin-relative angles directly on images, then export results to CSV for Minitab or other analysis tools.
 
-## Run
+## Download
 
-```bash
-uv sync                 # first time only
-uv run python main.py
-```
+Grab the latest `MicroMeasure.exe` from the [Releases](../../releases/latest) page — no installation needed, just run it.
 
 ## Features
 
-- **Open Folder** → step through every image with the bottom arrows or
-  PageUp/PageDown. The **origin carries** to the next image (just reposition it);
-  each image remembers its own drawings, so going back restores them. Readings
-  accumulate across all images into one CSV (with an `Image` column, and the
-  Part field auto-filled with the filename).
-- **Drawing backup** — every drawing auto-saves to `micromeasure_session.json`
-  inside the folder. Reopen that folder later and the app offers to redraw
-  everything, so you can visually QC what an operator measured.
-- **Tool visibility** — show/hide tools via the `[tools]` table in `config.toml`.
-- **Open** a single PNG/JPG/BMP/TIFF; zoom with the mouse wheel, pan with the Pan tool.
-- **Cursor magnifier** — a zoomed loupe follows the cursor in any measure tool so
-  you can place points precisely.
-- **Set Scale** — enter mm-per-pixel (e.g. `0.006367`); distances then read in mm.
-- **Distance** — click two points; length shows live as you move, pinned to the line.
-- **Angle (4 pt)** — click 4 points (two lines); the angle between them is drawn
-  with an arc + label in the image.
-- **Set Origin** — click two points to lock a reference line.
-- **Angle vs Origin** — click a line; its signed angle relative to the origin is shown.
-- **Readings panel** — every measurement is logged with Part / Operator / Trial
-  (Trial auto-increments) and can be **exported to CSV** for Minitab.
+- **Distance** — click two points; live preview with label pinned to the line.
+- **Angle (4 pt)** — click two lines (4 points); draws the angle arc with a label.
+- **Set Origin** — lock a reference line that persists across all images in a folder.
+- **Angle vs Origin** — signed angle of any line relative to the origin (±45°).
+- **Set Scale** — enter mm-per-pixel to read distances in mm instead of pixels.
+- **Cursor magnifier** — a zoomed loupe follows the cursor for precise point placement.
+- **Folder mode** — step through every image with arrows or PageUp/PageDown. The origin carries across images; each image remembers its own drawings.
+- **Session backup** — drawings auto-save to `micromeasure_session.json` in the folder. Reopen later to redraw and visually QC previous measurements.
+- **Readings panel** — logs every measurement with Part / Operator / Trial; **Export CSV** sends them to a file ready for Minitab.
 
-## Tips
+## Usage
 
-- Press **Esc** to cancel a measurement in progress.
-- Draw lines in a consistent direction for stable angle signs across a study.
+1. Run `MicroMeasure.exe`.
+2. Click **Open** to load a single image, or **Open Folder** to load a full set.
+3. Click **Set Scale** and enter your mm-per-pixel value (e.g. `0.006367`).
+4. Pick a tool from the toolbar, place your points, and read the result.
+5. Fill in Part / Operator fields in the Readings panel, then **Export CSV** when done.
 
-## Layout
+### Keyboard shortcuts
 
+| Key | Action |
+|-----|--------|
+| Esc | Cancel current measurement |
+| PageUp / PageDown | Next / previous image (folder mode) |
+| Arrow keys | Nudge last-placed point |
+
+## Configuration
+
+Settings are stored in `config.toml` next to the executable (created on first run). You can show or hide individual tools under the `[tools]` section.
+
+## Running from source
+
+```bash
+uv sync
+uv run python main.py
 ```
-main.py                         thin entry point
-src/micromeasure/
-  config/settings.py            frozen AppConfig + TOML loader
-  services/geometry.py          pure geometry (angles, distances, intersections)
-  services/measurements.py      Measurement data model
-  services/export.py            CSV export
-  ui/canvas.py                  interactive QGraphicsView (tools, preview)
-  ui/items.py                   graphics item builders (lines, arcs, labels)
-  ui/magnifier.py               cursor loupe widget
-  ui/main_window.py             toolbar, readings panel, dialogs
-```
+
+Requires Python 3.11+ and [uv](https://docs.astral.sh/uv/).
