@@ -3,7 +3,3 @@ __pycache__/
 *.pyc
 config.toml
 
-# user working data / outputs — not part of the app
-validation/
-*.csv
-micromeasure_session.json

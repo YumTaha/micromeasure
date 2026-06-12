@@ -1,0 +1,481 @@
+﻿Tooth,#,Image,Part,Kind,Value,Unit,Detail
+1,1,01.png,01.png,angle_vs_origin,18.7554,°,vs origin (folded ±45)
+1,2,01.png,01.png,angle_vs_origin,-10.4292,°,vs origin (folded ±45)
+1,1-2,01.png,01.png,angle,60.8154,°,angle between 2 lines (linked)
+1,4,01.png,01.png,perp_to_origin,2.3482,mm,368.8 px
+1,5,02.png,02.png,angle_vs_origin,18.4869,°,vs origin (folded ±45)
+1,6,02.png,02.png,angle_vs_origin,-10.8048,°,vs origin (folded ±45)
+1,5-6,02.png,02.png,angle,60.7084,°,angle between 2 lines (linked)
+1,8,02.png,02.png,perp_to_origin,2.3547,mm,369.8 px
+2,9,02.png,02.png,angle_vs_origin,19.4531,°,vs origin (folded ±45)
+2,10,02.png,02.png,angle_vs_origin,-10.4292,°,vs origin (folded ±45)
+2,9-10,02.png,02.png,angle,60.1177,°,angle between 2 lines (linked)
+2,12,02.png,02.png,perp_to_origin,2.2584,mm,354.7 px
+1,13,03.png,03.png,angle_vs_origin,18.8702,°,vs origin (folded ±45)
+1,14,03.png,03.png,angle_vs_origin,-10.3901,°,vs origin (folded ±45)
+1,13-14,03.png,03.png,angle,60.7396,°,angle between 2 lines (linked)
+1,16,03.png,03.png,perp_to_origin,2.3491,mm,368.9 px
+2,17,03.png,03.png,angle_vs_origin,18.7119,°,vs origin (folded ±45)
+2,18,03.png,03.png,angle_vs_origin,-10.9190,°,vs origin (folded ±45)
+2,17-18,03.png,03.png,angle,60.3691,°,angle between 2 lines (linked)
+2,20,03.png,03.png,perp_to_origin,2.2655,mm,355.8 px
+3,21,03.png,03.png,angle_vs_origin,18.9529,°,vs origin (folded ±45)
+3,22,03.png,03.png,angle_vs_origin,-10.8342,°,vs origin (folded ±45)
+3,21-22,03.png,03.png,angle,60.2129,°,angle between 2 lines (linked)
+3,24,03.png,03.png,perp_to_origin,2.3577,mm,370.3 px
+1,25,04.png,04.png,angle_vs_origin,18.7169,°,vs origin (folded ±45)
+1,26,04.png,04.png,angle_vs_origin,-10.8490,°,vs origin (folded ±45)
+1,25-26,04.png,04.png,angle,60.4341,°,angle between 2 lines (linked)
+1,28,04.png,04.png,perp_to_origin,2.3526,mm,369.5 px
+2,29,04.png,04.png,angle_vs_origin,18.6223,°,vs origin (folded ±45)
+2,30,04.png,04.png,angle_vs_origin,-10.4208,°,vs origin (folded ±45)
+2,29-30,04.png,04.png,angle,60.9569,°,angle between 2 lines (linked)
+2,32,04.png,04.png,perp_to_origin,2.2658,mm,355.9 px
+3,33,04.png,04.png,angle_vs_origin,19.2371,°,vs origin (folded ±45)
+3,34,04.png,04.png,angle_vs_origin,-10.7792,°,vs origin (folded ±45)
+3,33-34,04.png,04.png,angle,59.9837,°,angle between 2 lines (linked)
+3,36,04.png,04.png,perp_to_origin,2.3495,mm,369.0 px
+4,37,04.png,04.png,angle_vs_origin,19.0197,°,vs origin (folded ±45)
+4,38,04.png,04.png,angle_vs_origin,-10.6512,°,vs origin (folded ±45)
+4,37-38,04.png,04.png,angle,60.3291,°,angle between 2 lines (linked)
+4,40,04.png,04.png,perp_to_origin,2.3351,mm,366.7 px
+1,41,05.png,05.png,angle_vs_origin,18.8610,°,vs origin (folded ±45)
+1,42,05.png,05.png,angle_vs_origin,-11.0824,°,vs origin (folded ±45)
+1,41-42,05.png,05.png,angle,60.0566,°,angle between 2 lines (linked)
+1,44,05.png,05.png,perp_to_origin,2.3516,mm,369.3 px
+2,45,05.png,05.png,angle_vs_origin,18.9810,°,vs origin (folded ±45)
+2,46,05.png,05.png,angle_vs_origin,-10.4472,°,vs origin (folded ±45)
+2,45-46,05.png,05.png,angle,60.5718,°,angle between 2 lines (linked)
+2,48,05.png,05.png,perp_to_origin,2.2575,mm,354.6 px
+3,49,05.png,05.png,angle_vs_origin,18.3949,°,vs origin (folded ±45)
+3,50,05.png,05.png,angle_vs_origin,-11.6905,°,vs origin (folded ±45)
+3,49-50,05.png,05.png,angle,59.9145,°,angle between 2 lines (linked)
+3,52,05.png,05.png,perp_to_origin,2.3425,mm,367.9 px
+4,53,05.png,05.png,angle_vs_origin,19.6417,°,vs origin (folded ±45)
+4,54,05.png,05.png,angle_vs_origin,-10.8184,°,vs origin (folded ±45)
+4,53-54,05.png,05.png,angle,59.5399,°,angle between 2 lines (linked)
+4,56,05.png,05.png,perp_to_origin,2.3417,mm,367.8 px
+5,57,05.png,05.png,angle_vs_origin,18.8822,°,vs origin (folded ±45)
+5,58,05.png,05.png,angle_vs_origin,-11.3777,°,vs origin (folded ±45)
+5,57-58,05.png,05.png,angle,59.7401,°,angle between 2 lines (linked)
+5,60,05.png,05.png,perp_to_origin,2.3247,mm,365.1 px
+2,61,06.png,06.png,angle_vs_origin,19.0074,°,vs origin (folded ±45)
+2,62,06.png,06.png,angle_vs_origin,-10.9769,°,vs origin (folded ±45)
+2,61-62,06.png,06.png,angle,60.0156,°,angle between 2 lines (linked)
+2,64,06.png,06.png,perp_to_origin,2.2541,mm,354.0 px
+3,65,06.png,06.png,angle_vs_origin,19.8958,°,vs origin (folded ±45)
+3,66,06.png,06.png,angle_vs_origin,-10.3707,°,vs origin (folded ±45)
+3,65-66,06.png,06.png,angle,59.7335,°,angle between 2 lines (linked)
+3,68,06.png,06.png,perp_to_origin,2.3448,mm,368.3 px
+4,69,06.png,06.png,angle_vs_origin,19.0973,°,vs origin (folded ±45)
+4,70,06.png,06.png,angle_vs_origin,-10.8071,°,vs origin (folded ±45)
+4,69-70,06.png,06.png,angle,60.0956,°,angle between 2 lines (linked)
+4,72,06.png,06.png,perp_to_origin,2.3363,mm,366.9 px
+5,73,06.png,06.png,angle_vs_origin,18.7108,°,vs origin (folded ±45)
+5,74,06.png,06.png,angle_vs_origin,-10.9756,°,vs origin (folded ±45)
+5,73-74,06.png,06.png,angle,60.3136,°,angle between 2 lines (linked)
+5,76,06.png,06.png,perp_to_origin,2.3218,mm,364.7 px
+6,77,06.png,06.png,angle_vs_origin,18.5110,°,vs origin (folded ±45)
+6,78,06.png,06.png,angle_vs_origin,-11.1319,°,vs origin (folded ±45)
+6,77-78,06.png,06.png,angle,60.3571,°,angle between 2 lines (linked)
+6,80,06.png,06.png,perp_to_origin,2.3275,mm,365.6 px
+3,81,07.png,07.png,angle_vs_origin,17.3742,°,vs origin (folded ±45)
+3,82,07.png,07.png,angle_vs_origin,-11.6274,°,vs origin (folded ±45)
+3,81-82,07.png,07.png,angle,60.9983,°,angle between 2 lines (linked)
+3,84,07.png,07.png,perp_to_origin,2.3462,mm,368.5 px
+4,85,07.png,07.png,angle_vs_origin,18.4039,°,vs origin (folded ±45)
+4,86,07.png,07.png,angle_vs_origin,-12.1551,°,vs origin (folded ±45)
+4,85-86,07.png,07.png,angle,59.4410,°,angle between 2 lines (linked)
+4,88,07.png,07.png,perp_to_origin,2.3306,mm,366.0 px
+5,89,07.png,07.png,angle_vs_origin,17.8435,°,vs origin (folded ±45)
+5,90,07.png,07.png,angle_vs_origin,-10.3002,°,vs origin (folded ±45)
+5,89-90,07.png,07.png,angle,61.8563,°,angle between 2 lines (linked)
+5,92,07.png,07.png,perp_to_origin,2.3015,mm,361.5 px
+6,93,07.png,07.png,angle_vs_origin,19.2703,°,vs origin (folded ±45)
+6,94,07.png,07.png,angle_vs_origin,-10.4526,°,vs origin (folded ±45)
+6,93-94,07.png,07.png,angle,60.2772,°,angle between 2 lines (linked)
+6,96,07.png,07.png,perp_to_origin,2.3225,mm,364.8 px
+4,97,08.png,08.png,angle_vs_origin,18.4745,°,vs origin (folded ±45)
+4,98,08.png,08.png,angle_vs_origin,-10.9309,°,vs origin (folded ±45)
+4,97-98,08.png,08.png,angle,60.5946,°,angle between 2 lines (linked)
+4,100,08.png,08.png,perp_to_origin,2.3412,mm,367.7 px
+5,101,08.png,08.png,angle_vs_origin,19.1412,°,vs origin (folded ±45)
+5,102,08.png,08.png,angle_vs_origin,-9.9940,°,vs origin (folded ±45)
+5,101-102,08.png,08.png,angle,60.8648,°,angle between 2 lines (linked)
+5,104,08.png,08.png,perp_to_origin,2.3255,mm,365.2 px
+6,105,08.png,08.png,angle_vs_origin,17.9206,°,vs origin (folded ±45)
+6,106,08.png,08.png,angle_vs_origin,-10.9657,°,vs origin (folded ±45)
+6,105-106,08.png,08.png,angle,61.1137,°,angle between 2 lines (linked)
+6,108,08.png,08.png,perp_to_origin,2.3157,mm,363.7 px
+5,109,09.png,09.png,angle_vs_origin,18.0652,°,vs origin (folded ±45)
+5,110,09.png,09.png,angle_vs_origin,-10.8043,°,vs origin (folded ±45)
+5,109-110,09.png,09.png,angle,61.1305,°,angle between 2 lines (linked)
+5,112,09.png,09.png,perp_to_origin,2.3160,mm,363.7 px
+6,113,09.png,09.png,angle_vs_origin,19.1448,°,vs origin (folded ±45)
+6,114,09.png,09.png,angle_vs_origin,-10.6736,°,vs origin (folded ±45)
+6,113-114,09.png,09.png,angle,60.1816,°,angle between 2 lines (linked)
+6,116,09.png,09.png,perp_to_origin,2.3252,mm,365.2 px
+6,117,10.png,10.png,angle_vs_origin,19.8422,°,vs origin (folded ±45)
+6,118,10.png,10.png,angle_vs_origin,-10.0518,°,vs origin (folded ±45)
+6,117-118,10.png,10.png,angle,60.1061,°,angle between 2 lines (linked)
+6,120,10.png,10.png,perp_to_origin,2.3294,mm,365.9 px
+7,121,11.png,11.png,angle_vs_origin,22.7574,°,vs origin (folded ±45)
+7,122,11.png,11.png,angle_vs_origin,-7.1374,°,vs origin (folded ±45)
+7,121-122,11.png,11.png,angle,60.1052,°,angle between 2 lines (linked)
+7,124,11.png,11.png,perp_to_origin,2.2186,mm,348.5 px
+7,125,12.png,12.png,angle_vs_origin,22.5328,°,vs origin (folded ±45)
+7,126,12.png,12.png,angle_vs_origin,-7.5122,°,vs origin (folded ±45)
+7,125-126,12.png,12.png,angle,59.9550,°,angle between 2 lines (linked)
+7,128,12.png,12.png,perp_to_origin,2.2275,mm,349.9 px
+8,129,12.png,12.png,angle_vs_origin,23.4079,°,vs origin (folded ±45)
+8,130,12.png,12.png,angle_vs_origin,-6.2534,°,vs origin (folded ±45)
+8,129-130,12.png,12.png,angle,60.3387,°,angle between 2 lines (linked)
+8,132,12.png,12.png,perp_to_origin,2.2368,mm,351.3 px
+7,133,13.png,13.png,angle_vs_origin,21.2610,°,vs origin (folded ±45)
+7,134,13.png,13.png,angle_vs_origin,-6.5247,°,vs origin (folded ±45)
+7,133-134,13.png,13.png,angle,62.2142,°,angle between 2 lines (linked)
+7,136,13.png,13.png,perp_to_origin,2.2228,mm,349.1 px
+8,137,13.png,13.png,angle_vs_origin,23.4159,°,vs origin (folded ±45)
+8,138,13.png,13.png,angle_vs_origin,-6.5188,°,vs origin (folded ±45)
+8,137-138,13.png,13.png,angle,60.0653,°,angle between 2 lines (linked)
+8,140,13.png,13.png,perp_to_origin,2.2488,mm,353.2 px
+9,141,13.png,13.png,angle_vs_origin,22.2866,°,vs origin (folded ±45)
+9,142,13.png,13.png,angle_vs_origin,-7.9482,°,vs origin (folded ±45)
+9,141-142,13.png,13.png,angle,59.7653,°,angle between 2 lines (linked)
+9,144,13.png,13.png,perp_to_origin,2.2272,mm,349.8 px
+7,145,14.png,14.png,angle_vs_origin,22.6172,°,vs origin (folded ±45)
+7,146,14.png,14.png,angle_vs_origin,-8.3740,°,vs origin (folded ±45)
+7,145-146,14.png,14.png,angle,59.0088,°,angle between 2 lines (linked)
+7,148,14.png,14.png,perp_to_origin,2.2040,mm,346.2 px
+8,149,14.png,14.png,angle_vs_origin,24.7767,°,vs origin (folded ±45)
+8,150,14.png,14.png,angle_vs_origin,-5.7751,°,vs origin (folded ±45)
+8,149-150,14.png,14.png,angle,59.4483,°,angle between 2 lines (linked)
+8,152,14.png,14.png,perp_to_origin,2.2152,mm,347.9 px
+9,153,14.png,14.png,angle_vs_origin,22.5188,°,vs origin (folded ±45)
+9,154,14.png,14.png,angle_vs_origin,-7.4000,°,vs origin (folded ±45)
+9,153-154,14.png,14.png,angle,60.0812,°,angle between 2 lines (linked)
+9,156,14.png,14.png,perp_to_origin,2.2156,mm,348.0 px
+10,157,14.png,14.png,angle_vs_origin,22.1557,°,vs origin (folded ±45)
+10,158,14.png,14.png,angle_vs_origin,-7.6853,°,vs origin (folded ±45)
+10,157-158,14.png,14.png,angle,60.1589,°,angle between 2 lines (linked)
+10,160,14.png,14.png,perp_to_origin,2.1781,mm,342.1 px
+7,161,15.png,15.png,angle_vs_origin,23.5513,°,vs origin (folded ±45)
+7,162,15.png,15.png,angle_vs_origin,-7.4460,°,vs origin (folded ±45)
+7,161-162,15.png,15.png,angle,59.0027,°,angle between 2 lines (linked)
+7,164,15.png,15.png,perp_to_origin,2.2152,mm,347.9 px
+8,165,15.png,15.png,angle_vs_origin,23.7251,°,vs origin (folded ±45)
+8,166,15.png,15.png,angle_vs_origin,-5.6873,°,vs origin (folded ±45)
+8,165-166,15.png,15.png,angle,60.5876,°,angle between 2 lines (linked)
+8,168,15.png,15.png,perp_to_origin,2.2337,mm,350.8 px
+9,169,15.png,15.png,angle_vs_origin,21.0358,°,vs origin (folded ±45)
+9,170,15.png,15.png,angle_vs_origin,-7.8906,°,vs origin (folded ±45)
+9,169-170,15.png,15.png,angle,61.0736,°,angle between 2 lines (linked)
+9,172,15.png,15.png,perp_to_origin,2.2273,mm,349.8 px
+10,173,15.png,15.png,angle_vs_origin,21.4473,°,vs origin (folded ±45)
+10,174,15.png,15.png,angle_vs_origin,-7.8807,°,vs origin (folded ±45)
+10,173-174,15.png,15.png,angle,60.6720,°,angle between 2 lines (linked)
+10,176,15.png,15.png,perp_to_origin,2.2051,mm,346.3 px
+11,177,15.png,15.png,angle_vs_origin,22.9363,°,vs origin (folded ±45)
+11,178,15.png,15.png,angle_vs_origin,-6.6318,°,vs origin (folded ±45)
+11,177-178,15.png,15.png,angle,60.4319,°,angle between 2 lines (linked)
+11,180,15.png,15.png,perp_to_origin,2.2383,mm,351.6 px
+8,181,16.png,16.png,angle_vs_origin,23.9708,°,vs origin (folded ±45)
+8,182,16.png,16.png,angle_vs_origin,-7.0190,°,vs origin (folded ±45)
+8,181-182,16.png,16.png,angle,59.0101,°,angle between 2 lines (linked)
+8,184,16.png,16.png,perp_to_origin,2.2313,mm,350.4 px
+9,185,16.png,16.png,angle_vs_origin,21.8855,°,vs origin (folded ±45)
+9,186,16.png,16.png,angle_vs_origin,-6.7848,°,vs origin (folded ±45)
+9,185-186,16.png,16.png,angle,61.3298,°,angle between 2 lines (linked)
+9,188,16.png,16.png,perp_to_origin,2.2152,mm,347.9 px
+10,189,16.png,16.png,angle_vs_origin,20.8296,°,vs origin (folded ±45)
+10,190,16.png,16.png,angle_vs_origin,-9.4461,°,vs origin (folded ±45)
+10,189-190,16.png,16.png,angle,59.7243,°,angle between 2 lines (linked)
+10,192,16.png,16.png,perp_to_origin,2.1883,mm,343.7 px
+11,193,16.png,16.png,angle_vs_origin,22.8691,°,vs origin (folded ±45)
+11,194,16.png,16.png,angle_vs_origin,-7.1341,°,vs origin (folded ±45)
+11,193-194,16.png,16.png,angle,59.9968,°,angle between 2 lines (linked)
+11,196,16.png,16.png,perp_to_origin,2.2308,mm,350.4 px
+12,197,16.png,16.png,angle_vs_origin,23.2920,°,vs origin (folded ±45)
+12,198,16.png,16.png,angle_vs_origin,-7.2929,°,vs origin (folded ±45)
+12,197-198,16.png,16.png,angle,59.4151,°,angle between 2 lines (linked)
+12,200,16.png,16.png,perp_to_origin,2.2139,mm,347.7 px
+9,201,17.png,17.png,angle_vs_origin,22.8986,°,vs origin (folded ±45)
+9,202,17.png,17.png,angle_vs_origin,-7.1275,°,vs origin (folded ±45)
+9,201-202,17.png,17.png,angle,59.9739,°,angle between 2 lines (linked)
+9,204,17.png,17.png,perp_to_origin,2.2176,mm,348.3 px
+10,205,17.png,17.png,angle_vs_origin,21.9946,°,vs origin (folded ±45)
+10,206,17.png,17.png,angle_vs_origin,-6.9829,°,vs origin (folded ±45)
+10,205-206,17.png,17.png,angle,61.0225,°,angle between 2 lines (linked)
+10,208,17.png,17.png,perp_to_origin,2.1982,mm,345.3 px
+11,209,17.png,17.png,angle_vs_origin,23.0011,°,vs origin (folded ±45)
+11,210,17.png,17.png,angle_vs_origin,-7.4632,°,vs origin (folded ±45)
+11,209-210,17.png,17.png,angle,59.5356,°,angle between 2 lines (linked)
+11,212,17.png,17.png,perp_to_origin,2.2309,mm,350.4 px
+12,213,17.png,17.png,angle_vs_origin,22.3664,°,vs origin (folded ±45)
+12,214,17.png,17.png,angle_vs_origin,-8.0352,°,vs origin (folded ±45)
+12,213-214,17.png,17.png,angle,59.5984,°,angle between 2 lines (linked)
+12,216,17.png,17.png,perp_to_origin,2.2075,mm,346.7 px
+10,217,18.png,18.png,angle_vs_origin,21.8162,°,vs origin (folded ±45)
+10,218,18.png,18.png,angle_vs_origin,-7.9917,°,vs origin (folded ±45)
+10,217-218,18.png,18.png,angle,60.1921,°,angle between 2 lines (linked)
+10,220,18.png,18.png,perp_to_origin,2.2011,mm,345.7 px
+11,221,18.png,18.png,angle_vs_origin,22.9461,°,vs origin (folded ±45)
+11,222,18.png,18.png,angle_vs_origin,-6.7868,°,vs origin (folded ±45)
+11,221-222,18.png,18.png,angle,60.2672,°,angle between 2 lines (linked)
+11,224,18.png,18.png,perp_to_origin,2.2309,mm,350.4 px
+12,225,18.png,18.png,angle_vs_origin,22.3613,°,vs origin (folded ±45)
+12,226,18.png,18.png,angle_vs_origin,-6.2480,°,vs origin (folded ±45)
+12,225-226,18.png,18.png,angle,61.3907,°,angle between 2 lines (linked)
+12,228,18.png,18.png,perp_to_origin,2.2022,mm,345.9 px
+11,229,19.png,19.png,angle_vs_origin,22.1103,°,vs origin (folded ±45)
+11,230,19.png,19.png,angle_vs_origin,-7.4341,°,vs origin (folded ±45)
+11,229-230,19.png,19.png,angle,60.4557,°,angle between 2 lines (linked)
+11,232,19.png,19.png,perp_to_origin,2.2172,mm,348.2 px
+12,233,19.png,19.png,angle_vs_origin,22.5418,°,vs origin (folded ±45)
+12,234,19.png,19.png,angle_vs_origin,-7.1223,°,vs origin (folded ±45)
+12,233-234,19.png,19.png,angle,60.3359,°,angle between 2 lines (linked)
+12,236,19.png,19.png,perp_to_origin,2.2039,mm,346.1 px
+12,237,20.png,20.png,angle_vs_origin,23.3211,°,vs origin (folded ±45)
+12,238,20.png,20.png,angle_vs_origin,-7.6801,°,vs origin (folded ±45)
+12,237-238,20.png,20.png,angle,58.9988,°,angle between 2 lines (linked)
+12,240,20.png,20.png,perp_to_origin,2.2090,mm,346.9 px
+13,241,21.png,21.png,angle_vs_origin,20.6945,°,vs origin (folded ±45)
+13,242,21.png,21.png,angle_vs_origin,-9.3775,°,vs origin (folded ±45)
+13,241-242,21.png,21.png,angle,59.9280,°,angle between 2 lines (linked)
+13,244,21.png,21.png,perp_to_origin,2.1552,mm,338.5 px
+13,245,22.png,22.png,angle_vs_origin,19.8016,°,vs origin (folded ±45)
+13,246,22.png,22.png,angle_vs_origin,-8.9263,°,vs origin (folded ±45)
+13,245-246,22.png,22.png,angle,61.2721,°,angle between 2 lines (linked)
+13,248,22.png,22.png,perp_to_origin,2.1598,mm,339.2 px
+14,249,22.png,22.png,angle_vs_origin,20.6742,°,vs origin (folded ±45)
+14,250,22.png,22.png,angle_vs_origin,-9.3847,°,vs origin (folded ±45)
+14,249-250,22.png,22.png,angle,59.9412,°,angle between 2 lines (linked)
+14,252,22.png,22.png,perp_to_origin,2.2148,mm,347.9 px
+13,253,23.png,23.png,angle_vs_origin,21.5008,°,vs origin (folded ±45)
+13,254,23.png,23.png,angle_vs_origin,-9.8675,°,vs origin (folded ±45)
+13,253-254,23.png,23.png,angle,58.6317,°,angle between 2 lines (linked)
+13,256,23.png,23.png,perp_to_origin,2.1629,mm,339.7 px
+14,257,23.png,23.png,angle_vs_origin,20.5278,°,vs origin (folded ±45)
+14,258,23.png,23.png,angle_vs_origin,-9.5315,°,vs origin (folded ±45)
+14,257-258,23.png,23.png,angle,59.9407,°,angle between 2 lines (linked)
+14,260,23.png,23.png,perp_to_origin,2.2043,mm,346.2 px
+15,261,23.png,23.png,angle_vs_origin,20.0335,°,vs origin (folded ±45)
+15,262,23.png,23.png,angle_vs_origin,-9.3007,°,vs origin (folded ±45)
+15,261-262,23.png,23.png,angle,60.6657,°,angle between 2 lines (linked)
+15,264,23.png,23.png,perp_to_origin,2.2110,mm,347.3 px
+13,265,24.png,24.png,angle_vs_origin,21.1479,°,vs origin (folded ±45)
+13,266,24.png,24.png,angle_vs_origin,-10.6262,°,vs origin (folded ±45)
+13,265-266,24.png,24.png,angle,58.2259,°,angle between 2 lines (linked)
+13,268,24.png,24.png,perp_to_origin,2.1537,mm,338.3 px
+14,269,24.png,24.png,angle_vs_origin,19.2862,°,vs origin (folded ±45)
+14,270,24.png,24.png,angle_vs_origin,-8.9920,°,vs origin (folded ±45)
+14,269-270,24.png,24.png,angle,61.7218,°,angle between 2 lines (linked)
+14,272,24.png,24.png,perp_to_origin,2.2029,mm,346.0 px
+15,273,24.png,24.png,angle_vs_origin,20.9192,°,vs origin (folded ±45)
+15,274,24.png,24.png,angle_vs_origin,-9.8664,°,vs origin (folded ±45)
+15,273-274,24.png,24.png,angle,59.2144,°,angle between 2 lines (linked)
+15,276,24.png,24.png,perp_to_origin,2.2071,mm,346.6 px
+16,277,24.png,24.png,angle_vs_origin,20.9930,°,vs origin (folded ±45)
+16,278,24.png,24.png,angle_vs_origin,-9.6440,°,vs origin (folded ±45)
+16,277-278,24.png,24.png,angle,59.3630,°,angle between 2 lines (linked)
+16,280,24.png,24.png,perp_to_origin,2.2252,mm,349.5 px
+13,281,25.png,25.png,angle_vs_origin,20.3650,°,vs origin (folded ±45)
+13,282,25.png,25.png,angle_vs_origin,-9.3108,°,vs origin (folded ±45)
+13,281-282,25.png,25.png,angle,60.3242,°,angle between 2 lines (linked)
+13,284,25.png,25.png,perp_to_origin,2.1570,mm,338.8 px
+14,285,25.png,25.png,angle_vs_origin,20.9482,°,vs origin (folded ±45)
+14,286,25.png,25.png,angle_vs_origin,-9.5475,°,vs origin (folded ±45)
+14,285-286,25.png,25.png,angle,59.5042,°,angle between 2 lines (linked)
+14,288,25.png,25.png,perp_to_origin,2.2137,mm,347.7 px
+15,289,25.png,25.png,angle_vs_origin,20.0665,°,vs origin (folded ±45)
+15,290,25.png,25.png,angle_vs_origin,-8.1455,°,vs origin (folded ±45)
+15,289-290,25.png,25.png,angle,61.7881,°,angle between 2 lines (linked)
+15,292,25.png,25.png,perp_to_origin,2.2059,mm,346.5 px
+16,293,25.png,25.png,angle_vs_origin,19.5597,°,vs origin (folded ±45)
+16,294,25.png,25.png,angle_vs_origin,-8.7814,°,vs origin (folded ±45)
+16,293-294,25.png,25.png,angle,61.6589,°,angle between 2 lines (linked)
+16,296,25.png,25.png,perp_to_origin,2.2202,mm,348.7 px
+17,297,25.png,25.png,angle_vs_origin,19.9040,°,vs origin (folded ±45)
+17,298,25.png,25.png,angle_vs_origin,-9.0615,°,vs origin (folded ±45)
+17,297-298,25.png,25.png,angle,61.0346,°,angle between 2 lines (linked)
+17,300,25.png,25.png,perp_to_origin,2.2233,mm,349.2 px
+14,301,26.png,26.png,angle_vs_origin,19.8960,°,vs origin (folded ±45)
+14,302,26.png,26.png,angle_vs_origin,-8.8723,°,vs origin (folded ±45)
+14,301-302,26.png,26.png,angle,61.2318,°,angle between 2 lines (linked)
+14,304,26.png,26.png,perp_to_origin,2.2074,mm,346.7 px
+15,305,26.png,26.png,angle_vs_origin,20.4829,°,vs origin (folded ±45)
+15,306,26.png,26.png,angle_vs_origin,-9.5332,°,vs origin (folded ±45)
+15,305-306,26.png,26.png,angle,59.9839,°,angle between 2 lines (linked)
+15,308,26.png,26.png,perp_to_origin,2.2095,mm,347.0 px
+16,309,26.png,26.png,angle_vs_origin,20.8983,°,vs origin (folded ±45)
+16,310,26.png,26.png,angle_vs_origin,-8.6399,°,vs origin (folded ±45)
+16,309-310,26.png,26.png,angle,60.4617,°,angle between 2 lines (linked)
+16,312,26.png,26.png,perp_to_origin,2.2191,mm,348.5 px
+17,313,26.png,26.png,angle_vs_origin,19.9323,°,vs origin (folded ±45)
+17,314,26.png,26.png,angle_vs_origin,-9.2597,°,vs origin (folded ±45)
+17,313-314,26.png,26.png,angle,60.8080,°,angle between 2 lines (linked)
+17,316,26.png,26.png,perp_to_origin,2.2286,mm,350.0 px
+18,317,26.png,26.png,angle_vs_origin,21.2147,°,vs origin (folded ±45)
+18,318,26.png,26.png,angle_vs_origin,-9.1020,°,vs origin (folded ±45)
+18,317-318,26.png,26.png,angle,59.6832,°,angle between 2 lines (linked)
+18,320,26.png,26.png,perp_to_origin,2.2036,mm,346.1 px
+15,321,27.png,27.png,angle_vs_origin,20.5391,°,vs origin (folded ±45)
+15,322,27.png,27.png,angle_vs_origin,-9.5136,°,vs origin (folded ±45)
+15,321-322,27.png,27.png,angle,59.9472,°,angle between 2 lines (linked)
+15,324,27.png,27.png,perp_to_origin,2.2080,mm,346.8 px
+16,325,27.png,27.png,angle_vs_origin,20.8125,°,vs origin (folded ±45)
+16,326,27.png,27.png,angle_vs_origin,-10.0169,°,vs origin (folded ±45)
+16,325-326,27.png,27.png,angle,59.1706,°,angle between 2 lines (linked)
+16,328,27.png,27.png,perp_to_origin,2.2120,mm,347.4 px
+17,329,27.png,27.png,angle_vs_origin,20.5808,°,vs origin (folded ±45)
+17,330,27.png,27.png,angle_vs_origin,-8.8996,°,vs origin (folded ±45)
+17,329-330,27.png,27.png,angle,60.5195,°,angle between 2 lines (linked)
+17,332,27.png,27.png,perp_to_origin,2.2204,mm,348.7 px
+18,333,27.png,27.png,angle_vs_origin,19.8414,°,vs origin (folded ±45)
+18,334,27.png,27.png,angle_vs_origin,-9.2232,°,vs origin (folded ±45)
+18,333-334,27.png,27.png,angle,60.9354,°,angle between 2 lines (linked)
+18,336,27.png,27.png,perp_to_origin,2.1921,mm,344.3 px
+16,337,28.png,28.png,angle_vs_origin,20.3735,°,vs origin (folded ±45)
+16,338,28.png,28.png,angle_vs_origin,-9.8498,°,vs origin (folded ±45)
+16,337-338,28.png,28.png,angle,59.7767,°,angle between 2 lines (linked)
+16,340,28.png,28.png,perp_to_origin,2.2168,mm,348.2 px
+17,341,28.png,28.png,angle_vs_origin,20.0868,°,vs origin (folded ±45)
+17,342,28.png,28.png,angle_vs_origin,-8.6921,°,vs origin (folded ±45)
+17,341-342,28.png,28.png,angle,61.2211,°,angle between 2 lines (linked)
+17,344,28.png,28.png,perp_to_origin,2.2316,mm,350.5 px
+18,345,28.png,28.png,angle_vs_origin,19.7597,°,vs origin (folded ±45)
+18,346,28.png,28.png,angle_vs_origin,-9.5738,°,vs origin (folded ±45)
+18,345-346,28.png,28.png,angle,60.6665,°,angle between 2 lines (linked)
+18,348,28.png,28.png,perp_to_origin,2.2037,mm,346.1 px
+17,349,29.png,29.png,angle_vs_origin,20.3024,°,vs origin (folded ±45)
+17,350,29.png,29.png,angle_vs_origin,-10.2178,°,vs origin (folded ±45)
+17,349-350,29.png,29.png,angle,59.4798,°,angle between 2 lines (linked)
+17,352,29.png,29.png,perp_to_origin,2.2289,mm,350.1 px
+18,353,29.png,29.png,angle_vs_origin,21.1525,°,vs origin (folded ±45)
+18,354,29.png,29.png,angle_vs_origin,-9.0874,°,vs origin (folded ±45)
+18,353-354,29.png,29.png,angle,59.7602,°,angle between 2 lines (linked)
+18,356,29.png,29.png,perp_to_origin,2.1963,mm,344.9 px
+18,357,30.png,30.png,angle_vs_origin,19.4948,°,vs origin (folded ±45)
+18,358,30.png,30.png,angle_vs_origin,-9.6858,°,vs origin (folded ±45)
+18,357-358,30.png,30.png,angle,60.8194,°,angle between 2 lines (linked)
+18,360,30.png,30.png,perp_to_origin,2.1997,mm,345.5 px
+19,361,31.png,31.png,angle_vs_origin,21.7188,°,vs origin (folded ±45)
+19,362,31.png,31.png,angle_vs_origin,-8.0495,°,vs origin (folded ±45)
+19,361-362,31.png,31.png,angle,60.2317,°,angle between 2 lines (linked)
+19,364,31.png,31.png,perp_to_origin,2.1592,mm,339.1 px
+19,365,32.png,32.png,angle_vs_origin,20.8504,°,vs origin (folded ±45)
+19,366,32.png,32.png,angle_vs_origin,-6.7898,°,vs origin (folded ±45)
+19,365-366,32.png,32.png,angle,62.3597,°,angle between 2 lines (linked)
+19,368,32.png,32.png,perp_to_origin,2.1535,mm,338.2 px
+20,369,32.png,32.png,angle_vs_origin,21.3508,°,vs origin (folded ±45)
+20,370,32.png,32.png,angle_vs_origin,-8.7663,°,vs origin (folded ±45)
+20,369-370,32.png,32.png,angle,59.8829,°,angle between 2 lines (linked)
+20,372,32.png,32.png,perp_to_origin,2.1803,mm,342.4 px
+19,373,33.png,33.png,angle_vs_origin,-7.7245,°,vs origin (folded ±45)
+19,374,33.png,33.png,angle_vs_origin,21.5998,°,vs origin (folded ±45)
+19,373-374,33.png,33.png,angle,60.6757,°,angle between 2 lines (linked)
+19,376,33.png,33.png,perp_to_origin,2.1571,mm,338.8 px
+20,377,33.png,33.png,angle_vs_origin,-6.5732,°,vs origin (folded ±45)
+20,378,33.png,33.png,angle_vs_origin,21.3434,°,vs origin (folded ±45)
+20,377-378,33.png,33.png,angle,62.0834,°,angle between 2 lines (linked)
+20,380,33.png,33.png,perp_to_origin,2.1743,mm,341.5 px
+21,381,33.png,33.png,angle_vs_origin,20.7947,°,vs origin (folded ±45)
+21,382,33.png,33.png,angle_vs_origin,-7.2834,°,vs origin (folded ±45)
+21,381-382,33.png,33.png,angle,61.9219,°,angle between 2 lines (linked)
+21,384,33.png,33.png,perp_to_origin,2.1833,mm,342.9 px
+19,385,34.png,34.png,angle_vs_origin,21.1092,°,vs origin (folded ±45)
+19,386,34.png,34.png,angle_vs_origin,-8.7697,°,vs origin (folded ±45)
+19,385-386,34.png,34.png,angle,60.1211,°,angle between 2 lines (linked)
+19,388,34.png,34.png,perp_to_origin,2.1471,mm,337.2 px
+20,389,34.png,34.png,angle_vs_origin,21.9494,°,vs origin (folded ±45)
+20,390,34.png,34.png,angle_vs_origin,-7.6552,°,vs origin (folded ±45)
+20,389-390,34.png,34.png,angle,60.3954,°,angle between 2 lines (linked)
+20,392,34.png,34.png,perp_to_origin,2.1757,mm,341.7 px
+21,393,34.png,34.png,angle_vs_origin,22.2204,°,vs origin (folded ±45)
+21,394,34.png,34.png,angle_vs_origin,-6.9013,°,vs origin (folded ±45)
+21,393-394,34.png,34.png,angle,60.8783,°,angle between 2 lines (linked)
+21,396,34.png,34.png,perp_to_origin,2.1905,mm,344.0 px
+22,397,34.png,34.png,angle_vs_origin,22.5217,°,vs origin (folded ±45)
+22,398,34.png,34.png,angle_vs_origin,-6.8627,°,vs origin (folded ±45)
+22,397-398,34.png,34.png,angle,60.6156,°,angle between 2 lines (linked)
+22,400,34.png,34.png,perp_to_origin,2.1357,mm,335.4 px
+19,401,35.png,35.png,angle_vs_origin,21.9341,°,vs origin (folded ±45)
+19,402,35.png,35.png,angle_vs_origin,-7.8025,°,vs origin (folded ±45)
+19,401-402,35.png,35.png,angle,60.2634,°,angle between 2 lines (linked)
+19,404,35.png,35.png,perp_to_origin,2.1634,mm,339.8 px
+20,405,35.png,35.png,angle_vs_origin,22.3382,°,vs origin (folded ±45)
+20,406,35.png,35.png,angle_vs_origin,-7.3816,°,vs origin (folded ±45)
+20,405-406,35.png,35.png,angle,60.2802,°,angle between 2 lines (linked)
+20,408,35.png,35.png,perp_to_origin,2.1819,mm,342.7 px
+21,409,35.png,35.png,angle_vs_origin,21.7440,°,vs origin (folded ±45)
+21,410,35.png,35.png,angle_vs_origin,-8.0919,°,vs origin (folded ±45)
+21,409-410,35.png,35.png,angle,60.1641,°,angle between 2 lines (linked)
+21,412,35.png,35.png,perp_to_origin,2.1864,mm,343.4 px
+22,413,35.png,35.png,angle_vs_origin,21.7878,°,vs origin (folded ±45)
+22,414,35.png,35.png,angle_vs_origin,-7.8721,°,vs origin (folded ±45)
+22,413-414,35.png,35.png,angle,60.3401,°,angle between 2 lines (linked)
+22,416,35.png,35.png,perp_to_origin,2.1303,mm,334.6 px
+23,417,35.png,35.png,angle_vs_origin,21.8880,°,vs origin (folded ±45)
+23,418,35.png,35.png,angle_vs_origin,-7.3465,°,vs origin (folded ±45)
+23,417-418,35.png,35.png,angle,60.7655,°,angle between 2 lines (linked)
+23,420,35.png,35.png,perp_to_origin,2.1864,mm,343.4 px
+20,421,36.png,36.png,angle_vs_origin,21.4168,°,vs origin (folded ±45)
+20,422,36.png,36.png,angle_vs_origin,-7.1439,°,vs origin (folded ±45)
+20,421-422,36.png,36.png,angle,61.4393,°,angle between 2 lines (linked)
+20,424,36.png,36.png,perp_to_origin,2.1746,mm,341.5 px
+21,425,36.png,36.png,angle_vs_origin,22.8256,°,vs origin (folded ±45)
+21,426,36.png,36.png,angle_vs_origin,-7.4293,°,vs origin (folded ±45)
+21,425-426,36.png,36.png,angle,59.7451,°,angle between 2 lines (linked)
+21,428,36.png,36.png,perp_to_origin,2.1794,mm,342.3 px
+22,429,36.png,36.png,angle_vs_origin,21.5531,°,vs origin (folded ±45)
+22,430,36.png,36.png,angle_vs_origin,-7.8116,°,vs origin (folded ±45)
+22,429-430,36.png,36.png,angle,60.6353,°,angle between 2 lines (linked)
+22,432,36.png,36.png,perp_to_origin,2.1213,mm,333.2 px
+23,433,36.png,36.png,angle_vs_origin,20.8557,°,vs origin (folded ±45)
+23,434,36.png,36.png,angle_vs_origin,-8.1302,°,vs origin (folded ±45)
+23,433-434,36.png,36.png,angle,61.0141,°,angle between 2 lines (linked)
+23,436,36.png,36.png,perp_to_origin,2.1748,mm,341.6 px
+24,437,36.png,36.png,angle_vs_origin,22.6470,°,vs origin (folded ±45)
+24,438,36.png,36.png,angle_vs_origin,-7.6465,°,vs origin (folded ±45)
+24,437-438,36.png,36.png,angle,59.7065,°,angle between 2 lines (linked)
+24,440,36.png,36.png,perp_to_origin,2.1233,mm,333.5 px
+21,441,37.png,37.png,angle_vs_origin,21.8762,°,vs origin (folded ±45)
+21,442,37.png,37.png,angle_vs_origin,-8.2814,°,vs origin (folded ±45)
+21,441-442,37.png,37.png,angle,59.8423,°,angle between 2 lines (linked)
+21,444,37.png,37.png,perp_to_origin,2.1893,mm,343.8 px
+22,445,37.png,37.png,angle_vs_origin,22.0996,°,vs origin (folded ±45)
+22,446,37.png,37.png,angle_vs_origin,-7.4954,°,vs origin (folded ±45)
+22,445-446,37.png,37.png,angle,60.4050,°,angle between 2 lines (linked)
+22,448,37.png,37.png,perp_to_origin,2.1353,mm,335.4 px
+23,449,37.png,37.png,angle_vs_origin,22.2927,°,vs origin (folded ±45)
+23,450,37.png,37.png,angle_vs_origin,-7.7986,°,vs origin (folded ±45)
+23,449-450,37.png,37.png,angle,59.9087,°,angle between 2 lines (linked)
+23,452,37.png,37.png,perp_to_origin,2.1810,mm,342.6 px
+24,453,37.png,37.png,angle_vs_origin,20.4147,°,vs origin (folded ±45)
+24,454,37.png,37.png,angle_vs_origin,-9.1726,°,vs origin (folded ±45)
+24,453-454,37.png,37.png,angle,60.4128,°,angle between 2 lines (linked)
+24,456,37.png,37.png,perp_to_origin,2.1263,mm,334.0 px
+22,457,38.png,38.png,angle_vs_origin,22.3692,°,vs origin (folded ±45)
+22,458,38.png,38.png,angle_vs_origin,-8.1758,°,vs origin (folded ±45)
+22,457-458,38.png,38.png,angle,59.4550,°,angle between 2 lines (linked)
+22,460,38.png,38.png,perp_to_origin,2.1400,mm,336.1 px
+23,461,38.png,38.png,angle_vs_origin,22.6175,°,vs origin (folded ±45)
+23,462,38.png,38.png,angle_vs_origin,-7.6313,°,vs origin (folded ±45)
+23,461-462,38.png,38.png,angle,59.7512,°,angle between 2 lines (linked)
+23,464,38.png,38.png,perp_to_origin,2.1780,mm,342.1 px
+24,465,38.png,38.png,angle_vs_origin,21.0555,°,vs origin (folded ±45)
+24,466,38.png,38.png,angle_vs_origin,-7.5445,°,vs origin (folded ±45)
+24,465-466,38.png,38.png,angle,61.4000,°,angle between 2 lines (linked)
+24,468,38.png,38.png,perp_to_origin,2.1178,mm,332.6 px
+23,469,39.png,39.png,angle_vs_origin,22.0285,°,vs origin (folded ±45)
+23,470,39.png,39.png,angle_vs_origin,-7.8867,°,vs origin (folded ±45)
+23,469-470,39.png,39.png,angle,60.0847,°,angle between 2 lines (linked)
+23,472,39.png,39.png,perp_to_origin,2.1778,mm,342.0 px
+24,473,39.png,39.png,angle_vs_origin,22.2074,°,vs origin (folded ±45)
+24,474,39.png,39.png,angle_vs_origin,-7.6706,°,vs origin (folded ±45)
+24,473-474,39.png,39.png,angle,60.1220,°,angle between 2 lines (linked)
+24,476,39.png,39.png,perp_to_origin,2.1215,mm,333.2 px
+24,477,40.png,40.png,angle_vs_origin,22.1870,°,vs origin (folded ±45)
+24,478,40.png,40.png,angle_vs_origin,-7.1583,°,vs origin (folded ±45)
+24,477-478,40.png,40.png,angle,60.6547,°,angle between 2 lines (linked)
+24,480,40.png,40.png,perp_to_origin,2.1238,mm,333.6 px
