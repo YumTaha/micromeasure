@@ -1,0 +1,36 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Build executable
+        run: uv run --with pyinstaller pyinstaller --onefile --windowed --name MicroMeasure --paths src main.py
+
+      - name: Upload release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/MicroMeasure.exe
+          generate_release_notes: true
